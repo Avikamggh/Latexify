@@ -885,6 +885,209 @@
 <!-- TOAST -->
 <div id="toast"></div>
 
+<!-- Raw LaTeX default content stored here to avoid JS string escape issues -->
+<script type="text/template" id="default-tex">\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+% ---- Document Metadata ----
+\title{My Research Paper: A Comprehensive Study\\
+\large Subtitle Goes Here}
+\author{Author Name\\
+\textit{Department of Science, University of Research}\\
+\texttt{author@university.edu}}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This paper presents a comprehensive study of an important research topic.
+We demonstrate novel findings through rigorous experimentation and analysis.
+Our results show significant improvements over baseline methods, with implications
+for future research in this domain. All code and data are publicly available.
+\end{abstract}
+
+\section{Introduction}
+Research is the systematic investigation of materials and sources to establish
+facts and reach new conclusions. In this paper, we explore the fundamental
+aspects of our proposed method \cite{reference2024}.
+
+The main contributions of this work are:
+\begin{enumerate}
+  \item A novel theoretical framework for the problem
+  \item An efficient algorithm with $\mathcal{O}(n \log n)$ complexity
+  \item Extensive empirical evaluation on benchmark datasets
+\end{enumerate}
+
+\section{Related Work}
+Previous work by Smith et al. \cite{smith2023} proposed an early approach.
+Our method builds upon these foundations but introduces key improvements.
+
+\section{Methodology}
+\subsection{Problem Formulation}
+Let $\mathcal{X} = \{x_1, x_2, \ldots, x_n\}$ be the input space.
+We define our objective function as:
+
+\[
+  \mathcal{L}(\theta) = \frac{1}{n} \sum_{i=1}^{n} \ell(f_\theta(x_i), y_i) + \lambda \|\theta\|_2^2
+\]
+
+where $\lambda > 0$ is the regularization parameter and $f_\theta$ denotes
+our model parameterized by $\theta$.
+
+\subsection{Algorithm}
+The update rule at step $t$ is given by:
+
+\begin{equation}
+  \theta^{(t+1)} = \theta^{(t)} - \eta_t \nabla_\theta \mathcal{L}(\theta^{(t)})
+  \label{eq:update}
+\end{equation}
+
+Equation \ref{eq:update} shows the standard gradient descent update.
+
+\section{Experiments}
+\subsection{Datasets}
+We evaluate our method on three standard benchmarks:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Dataset} & \textbf{Train} & \textbf{Test} & \textbf{Classes} \\
+\hline
+Dataset A & 50,000 & 10,000 & 10 \\
+Dataset B & 60,000 & 6,000 & 100 \\
+Dataset C & 73,257 & 26,032 & 10 \\
+\hline
+\end{tabular}
+\caption{Summary of benchmark datasets used in our evaluation.}
+\label{tab:datasets}
+\end{table}
+
+\subsection{Results}
+Our method achieves state-of-the-art performance with \textbf{94.2\%} accuracy
+on Dataset A, significantly outperforming existing approaches.
+
+The improvement is statistically significant with $p < 0.01$ under a
+two-tailed $t$-test.
+
+\section{Conclusion}
+In this work, we presented a novel approach to the problem. Experimental
+results demonstrate the effectiveness of our method. Future work will
+explore extensions to larger-scale settings.
+
+\begin{thebibliography}{9}
+\bibitem{reference2024} J. Doe and A. Smith, ``A Method for Research,''
+  \textit{Journal of Science}, vol. 42, pp. 1--15, 2024.
+\bibitem{smith2023} A. Smith, ``Early Approaches,''
+  \textit{Proc. Conf. on AI}, 2023.
+\end{thebibliography}
+
+\end{document}
+</script>
+
+<script type="text/template" id="tpl-ieee">\documentclass[conference]{IEEEtran}
+\usepackage{amsmath,amssymb}
+\title{IEEE Conference Paper Template}
+\author{\IEEEauthorblockN{Author Name}
+\IEEEauthorblockA{Department\\University\\email@domain.com}}
+\begin{document}
+\maketitle
+\begin{abstract}
+Abstract text here. This paper presents a novel contribution to the field.
+\end{abstract}
+\section{Introduction}
+Introduction text. Motivation and background go here.
+\section{Related Work}
+Prior work summary.
+\section{Methodology}
+Our proposed method is defined as:
+\[
+  y = f(x; \theta)
+\]
+\section{Experiments}
+Experimental setup and results.
+\section{Conclusion}
+Conclusion and future work.
+\begin{thebibliography}{1}
+\bibitem{ref1} Author, ``Title,'' \textit{Journal}, 2024.
+\end{thebibliography}
+\end{document}
+</script>
+
+<script type="text/template" id="tpl-beamer">\documentclass{beamer}
+\usetheme{Madrid}
+\title{Presentation Title}
+\subtitle{Subtitle Here}
+\author{Author Name}
+\institute{University Name}
+\date{\today}
+\begin{document}
+\begin{frame}
+\titlepage
+\end{frame}
+\begin{frame}{Outline}
+\tableofcontents
+\end{frame}
+\section{Introduction}
+\begin{frame}{Introduction}
+\begin{itemize}
+  \item First point
+  \item Second point
+  \item Third point
+\end{itemize}
+\end{frame}
+\section{Results}
+\begin{frame}{Main Result}
+Our key equation:
+\[E = mc^2\]
+This leads to important conclusions.
+\end{frame}
+\section{Conclusion}
+\begin{frame}{Conclusion}
+\begin{itemize}
+  \item Summary point one
+  \item Summary point two
+  \item Future work directions
+\end{itemize}
+\end{frame}
+\end{document}
+</script>
+
+<script type="text/template" id="tpl-report">\documentclass[12pt,a4paper]{report}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage{geometry}
+\geometry{margin=1in}
+\title{Research Report}
+\author{Your Name}
+\date{\today}
+\begin{document}
+\maketitle
+\tableofcontents
+\chapter{Introduction}
+This report investigates an important research problem. Background and motivation.
+\chapter{Literature Review}
+Survey of existing work. Key references and their contributions.
+\chapter{Methodology}
+Description of methods used. Mathematical formulation:
+\[
+  f(x) = \int_{-\infty}^{\infty} \hat{f}(\xi) e^{2\pi i \xi x} d\xi
+\]
+\chapter{Results}
+Presentation of results, tables, and figures.
+\chapter{Conclusion}
+Summary of findings and directions for future research.
+\end{document}
+</script>
+
 <script>
 // ══════════════════════════════════════════════════════════
 //  STATE
@@ -896,178 +1099,14 @@ const state = {
   autoCompileTimer: null,
 };
 
-const DEFAULT_TEX = `\\documentclass[12pt,a4paper]{article}
-\\usepackage[utf8]{inputenc}
-\\usepackage{amsmath, amssymb, amsthm}
-\\usepackage{graphicx}
-\\usepackage{hyperref}
-\\usepackage{geometry}
-\\geometry{margin=1in}
+// DEFAULT_TEX is loaded from the hidden #default-tex script tag to avoid JS string escape issues
+const DEFAULT_TEX = document.getElementById('default-tex').textContent;
 
-% ---- Document Metadata ----
-\\title{My Research Paper: A Comprehensive Study\\\\
-\\large Subtitle Goes Here}
-\\author{Author Name\\\\
-\\textit{Department of Science, University of Research}\\\\
-\\texttt{author@university.edu}}
-\\date{\\today}
-
-\\begin{document}
-
-\\maketitle
-
-\\begin{abstract}
-This paper presents a comprehensive study of an important research topic.
-We demonstrate novel findings through rigorous experimentation and analysis.
-Our results show significant improvements over baseline methods, with implications
-for future research in this domain. All code and data are publicly available.
-\\end{abstract}
-
-\\section{Introduction}
-Research is the systematic investigation of materials and sources to establish
-facts and reach new conclusions. In this paper, we explore the fundamental
-aspects of our proposed method \\cite{reference2024}.
-
-The main contributions of this work are:
-\\begin{enumerate}
-  \\item A novel theoretical framework for the problem
-  \\item An efficient algorithm with $\\mathcal{O}(n \\log n)$ complexity
-  \\item Extensive empirical evaluation on benchmark datasets
-\\end{enumerate}
-
-\\section{Related Work}
-Previous work by Smith et al. \\cite{smith2023} proposed an early approach.
-Our method builds upon these foundations but introduces key improvements.
-
-\\section{Methodology}
-\\subsection{Problem Formulation}
-Let $\\mathcal{X} = \\{x_1, x_2, \\ldots, x_n\\}$ be the input space.
-We define our objective function as:
-
-\\[
-  \\mathcal{L}(\\theta) = \\frac{1}{n} \\sum_{i=1}^{n} \\ell(f_\\theta(x_i), y_i) + \\lambda \\|\\theta\\|_2^2
-\\]
-
-where $\\lambda > 0$ is the regularization parameter and $f_\\theta$ denotes
-our model parameterized by $\\theta$.
-
-\\subsection{Algorithm}
-The update rule at step $t$ is given by:
-
-\\begin{equation}
-  \\theta^{(t+1)} = \\theta^{(t)} - \\eta_t \\nabla_\\theta \\mathcal{L}(\\theta^{(t)})
-  \\label{eq:update}
-\\end{equation}
-
-Equation \\ref{eq:update} shows the standard gradient descent update.
-
-\\section{Experiments}
-\\subsection{Datasets}
-We evaluate our method on three standard benchmarks:
-
-\\begin{table}[h]
-\\centering
-\\begin{tabular}{|l|c|c|c|}
-\\hline
-\\textbf{Dataset} & \\textbf{Train} & \\textbf{Test} & \\textbf{Classes} \\\\
-\\hline
-Dataset A & 50,000 & 10,000 & 10 \\\\
-Dataset B & 60,000 & 6,000 & 100 \\\\
-Dataset C & 73,257 & 26,032 & 10 \\\\
-\\hline
-\\end{tabular}
-\\caption{Summary of benchmark datasets used in our evaluation.}
-\\label{tab:datasets}
-\\end{table}
-
-\\subsection{Results}
-Our method achieves state-of-the-art performance with \\textbf{94.2\\%} accuracy
-on Dataset A, significantly outperforming existing approaches.
-
-The improvement is statistically significant with $p < 0.01$ under a
-two-tailed $t$-test.
-
-\\section{Conclusion}
-In this work, we presented a novel approach to the problem. Experimental
-results demonstrate the effectiveness of our method. Future work will
-explore extensions to larger-scale settings.
-
-\\begin{thebibliography}{9}
-\\bibitem{reference2024} J. Doe and A. Smith, ``A Method for Research,''
-  \\textit{Journal of Science}, vol. 42, pp. 1--15, 2024.
-\\bibitem{smith2023} A. Smith, ``Early Approaches,''
-  \\textit{Proc. Conf. on AI}, 2023.
-\\end{thebibliography}
-
-\\end{document}`;
-
+// Templates loaded from hidden script tags to avoid JS backslash escape issues
 const TEMPLATES = {
-  ieee: `\\documentclass[conference]{IEEEtran}
-\\usepackage{amsmath,amssymb}
-\\title{IEEE Conference Paper Template}
-\\author{\\IEEEauthorblockN{Author Name}
-\\IEEEauthorblockA{Department\\\\University\\\\email@domain.com}}
-\\begin{document}
-\\maketitle
-\\begin{abstract}
-Abstract text here.
-\\end{abstract}
-\\section{Introduction}
-Introduction text.
-\\section{Conclusion}
-Conclusion.
-\\begin{thebibliography}{1}
-\\bibitem{ref1} Author, ``Title,'' \\textit{Journal}, 2024.
-\\end{thebibliography}
-\\end{document}`,
-
-  beamer: `\\documentclass{beamer}
-\\usetheme{Madrid}
-\\title{Presentation Title}
-\\author{Author Name}
-\\date{\\today}
-\\begin{document}
-\\begin{frame}
-\\titlepage
-\\end{frame}
-\\begin{frame}{Outline}
-\\tableofcontents
-\\end{frame}
-\\section{Introduction}
-\\begin{frame}{Introduction}
-\\begin{itemize}
-  \\item First point
-  \\item Second point
-  \\item Third point
-\\end{itemize}
-\\end{frame}
-\\section{Results}
-\\begin{frame}{Results}
-Our main result:
-\\[E = mc^2\\]
-\\end{frame}
-\\end{document}`,
-
-  report: `\\documentclass[12pt,a4paper]{report}
-\\usepackage[utf8]{inputenc}
-\\usepackage{amsmath}
-\\title{Research Report}
-\\author{Your Name}
-\\date{\\today}
-\\begin{document}
-\\maketitle
-\\tableofcontents
-\\chapter{Introduction}
-Introduction chapter.
-\\chapter{Literature Review}
-Literature review.
-\\chapter{Methodology}
-Methodology.
-\\chapter{Results}
-Results.
-\\chapter{Conclusion}
-Conclusion.
-\\end{document}`,
+  ieee:   document.getElementById('tpl-ieee').textContent,
+  beamer: document.getElementById('tpl-beamer').textContent,
+  report: document.getElementById('tpl-report').textContent,
 };
 
 const SYMBOLS = [
@@ -1153,12 +1192,14 @@ function fileIcon(name) {
 }
 
 function openFile(name) {
-  // save current
+  // save current file before switching
   if (state.activeFile && state.files[state.activeFile]) {
     state.files[state.activeFile].content = document.getElementById('latex-editor').value;
   }
   state.activeFile = name;
-  document.getElementById('latex-editor').value = state.files[name]?.content || '';
+  // ensure file entry exists
+  if (!state.files[name]) state.files[name] = { content: '', name };
+  document.getElementById('latex-editor').value = state.files[name].content;
   renderFileTree();
   renderTabs();
   updateLineNumbers();
@@ -1278,17 +1319,14 @@ function insertLine(text) {
 }
 
 function insertTemplate(name) {
-  const templates = {
-    ieee: TEMPLATES.ieee,
-    beamer: TEMPLATES.beamer,
-    report: TEMPLATES.report,
-  };
-  // show a small selection
-  const choice = prompt('Choose template: ieee, beamer, report', 'ieee');
-  if (!choice || !TEMPLATES[choice]) return;
-  document.getElementById('latex-editor').value = TEMPLATES[choice];
+  const choice = window.prompt('Choose a template:\n  ieee    — IEEE Conference Paper\n  beamer  — Presentation Slides\n  report  — Research Report\n\nType one of: ieee, beamer, report', 'ieee');
+  if (!choice) return;
+  const key = choice.trim().toLowerCase();
+  if (!TEMPLATES[key]) { toast('Unknown template. Choose: ieee, beamer, report'); return; }
+  if (state.files['main.tex']) state.files['main.tex'].content = TEMPLATES[key];
+  document.getElementById('latex-editor').value = TEMPLATES[key];
   triggerInput();
-  toast(`Template "${choice}" loaded`);
+  toast('Template "' + key + '" loaded ✓');
 }
 
 function updateLineNumbers() {
@@ -1321,7 +1359,9 @@ function updateStats() {
 }
 
 function autoSave() {
-  if (state.activeFile) state.files[state.activeFile].content = document.getElementById('latex-editor').value;
+  if (state.activeFile && state.files[state.activeFile]) {
+    state.files[state.activeFile].content = document.getElementById('latex-editor').value;
+  }
 }
 
 // ══════════════════════════════════════════════════════════
@@ -1413,7 +1453,8 @@ function compileLatex() {
   setStatus('Compiling…', 'compiling');
   setTimeout(() => {
     try {
-      const src = state.files['main.tex']?.content || document.getElementById('latex-editor').value;
+      const editorVal = document.getElementById('latex-editor').value;
+      const src = (state.files['main.tex'] && state.files['main.tex'].content) ? state.files['main.tex'].content : editorVal;
       const html = latexToHtml(src);
       document.getElementById('preview-page').innerHTML = html;
       // re-render MathJax
