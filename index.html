@@ -3,903 +3,479 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Latexify — Free LaTeX Editor for Researchers</title>
+<title>Latexify — Free LaTeX Editor</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,600;0,700;1,500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Fraunces:ital,wght@0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/dialog/dialog.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/foldgutter.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/stex/stex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/search/search.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/search/searchcursor.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/dialog/dialog.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/comment/comment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/foldcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/foldgutter.min.js"></script>
+<script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']],packages:{'[+]':['ams','boldsymbol']}},options:{skipHtmlTags:['script','noscript','style','textarea']},startup:{typeset:false}};</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
-  :root {
-    --bg: #0d0f14;
-    --surface: #13161e;
-    --surface2: #1a1e28;
-    --surface3: #222636;
-    --border: #2a2f42;
-    --border2: #333855;
-    --accent: #6c8ef5;
-    --accent2: #a78bfa;
-    --accent3: #34d399;
-    --text: #e8eaf0;
-    --text2: #9ba3bf;
-    --text3: #5a6480;
-    --red: #f87171;
-    --yellow: #fbbf24;
-    --font-mono: 'JetBrains Mono', monospace;
-    --font-display: 'Playfair Display', serif;
-    --font-body: 'DM Sans', sans-serif;
-    --sidebar-w: 260px;
-    --toolbar-h: 48px;
-    --header-h: 56px;
-  }
+:root{
+  --bg:#0e1117;--sf:#161b22;--sf2:#1c2333;--sf3:#21262d;
+  --bd:#30363d;--bd2:#444c56;
+  --ac:#58a6ff;--ac2:#79b8ff;--pu:#bc8cff;
+  --gr:#3fb950;--ye:#d29922;--re:#f85149;
+  --tx:#e6edf3;--tx2:#8b949e;--tx3:#484f58;
+  --mono:'JetBrains Mono',monospace;
+  --disp:'Fraunces',Georgia,serif;
+  --sans:'DM Sans',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--tx);font-family:var(--sans);font-size:14px;}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+/* HEADER */
+#hdr{height:52px;background:var(--sf);border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;padding:0 14px;gap:10px;z-index:200;position:relative;flex-shrink:0;}
+.logo{display:flex;align-items:center;gap:8px;text-decoration:none;flex-shrink:0;}
+.lm{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#58a6ff,#bc8cff);
+  display:flex;align-items:center;justify-content:center;font-family:var(--mono);
+  font-weight:700;font-size:12px;color:#fff;letter-spacing:-1px;}
+.ln{font-family:var(--disp);font-size:19px;font-weight:700;color:var(--tx);letter-spacing:-.3px;}
+.ln span{color:var(--ac);}
+.fb{font-size:10px;font-weight:600;background:var(--gr);color:#000;padding:2px 8px;
+  border-radius:99px;letter-spacing:.5px;text-transform:uppercase;flex-shrink:0;}
+#doc-title{flex:1;max-width:280px;background:var(--sf2);border:1px solid var(--bd);
+  color:var(--tx);font-family:var(--sans);font-size:13px;font-weight:500;
+  padding:6px 11px;border-radius:6px;outline:none;transition:border-color .15s;}
+#doc-title:focus{border-color:var(--ac);}
+.hdr-r{display:flex;align-items:center;gap:6px;margin-left:auto;}
 
-  html, body {
-    height: 100%;
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font-body);
-    font-size: 14px;
-    overflow: hidden;
-  }
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;
+  border-radius:6px;font-family:var(--sans);font-size:12.5px;font-weight:500;
+  cursor:pointer;border:none;transition:all .15s;white-space:nowrap;flex-shrink:0;}
+.btn svg{width:13px;height:13px;flex-shrink:0;}
+.bg{background:transparent;color:var(--tx2);border:1px solid var(--bd);}
+.bg:hover{background:var(--sf2);color:var(--tx);border-color:var(--bd2);}
+.bp{background:var(--ac);color:#000;font-weight:600;}.bp:hover{background:var(--ac2);}
+.bgr{background:var(--gr);color:#000;font-weight:600;}.bgr:hover{opacity:.85;}
+.sm{padding:4px 10px;font-size:11.5px;}
 
-  /* ── HEADER ── */
-  #header {
-    height: var(--header-h);
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    padding: 0 16px;
-    gap: 16px;
-    position: relative;
-    z-index: 100;
-  }
+/* TOOLBAR */
+#tb{height:42px;background:var(--sf2);border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;padding:0 8px;gap:1px;overflow-x:auto;
+  position:relative;z-index:100;flex-shrink:0;}
+#tb::-webkit-scrollbar{height:3px;}
+#tb::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:99px;}
+.ts{width:1px;height:22px;background:var(--bd);margin:0 4px;flex-shrink:0;}
+.tl{font-size:9.5px;font-weight:600;color:var(--tx3);text-transform:uppercase;
+  letter-spacing:.8px;padding:0 5px;flex-shrink:0;}
+.tb{display:inline-flex;align-items:center;gap:3px;padding:4px 8px;border:none;
+  background:transparent;color:var(--tx2);border-radius:5px;cursor:pointer;
+  font-family:var(--sans);font-size:11.5px;font-weight:500;transition:all .12s;
+  white-space:nowrap;flex-shrink:0;}
+.tb:hover{background:var(--sf3);color:var(--tx);}
+.tb.on{background:var(--ac);color:#000;}
+.tb svg{width:12px;height:12px;}
 
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-  }
-  .logo-icon {
-    width: 30px; height: 30px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-mono);
-    font-weight: 600;
-    font-size: 13px;
-    color: #fff;
-    letter-spacing: -1px;
-  }
-  .logo-text {
-    font-family: var(--font-display);
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--text);
-    letter-spacing: -0.5px;
-  }
-  .logo-text span { color: var(--accent); }
+/* SYMBOL PANEL */
+#sym-panel{position:absolute;left:0;right:0;top:42px;background:var(--sf2);
+  border-bottom:1px solid var(--bd);padding:7px 10px;display:none;
+  flex-wrap:wrap;gap:3px;z-index:50;max-height:108px;overflow-y:auto;}
+#sym-panel.open{display:flex;}
+.sym{padding:3px 7px;background:var(--sf3);border:1px solid var(--bd);
+  border-radius:4px;color:var(--tx);font-size:13px;cursor:pointer;
+  transition:all .1s;font-family:var(--mono);}
+.sym:hover{background:var(--ac);color:#000;border-color:var(--ac);}
 
-  .badge-free {
-    font-size: 10px;
-    font-weight: 600;
-    background: linear-gradient(90deg, var(--accent3), #10b981);
-    color: #000;
-    padding: 2px 7px;
-    border-radius: 99px;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-  }
+/* APP */
+#app{display:flex;height:calc(100vh - 52px - 42px - 26px);overflow:hidden;}
 
-  .header-center {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+/* SIDEBAR */
+#sb{width:214px;background:var(--sf);border-right:1px solid var(--bd);
+  display:flex;flex-direction:column;flex-shrink:0;transition:width .2s;overflow:hidden;}
+#sb.closed{width:0;}
+.sbh{padding:9px 11px 7px;border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;justify-content:space-between;}
+.sbt{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--tx3);}
+#flist{flex:1;overflow-y:auto;padding:5px 0;}
+#flist::-webkit-scrollbar{width:3px;}
+#flist::-webkit-scrollbar-thumb{background:var(--bd);border-radius:99px;}
+.fr{display:flex;align-items:center;gap:6px;padding:6px 11px;cursor:pointer;
+  color:var(--tx2);font-size:12.5px;transition:all .1s;border-left:2px solid transparent;}
+.fr:hover{background:var(--sf2);color:var(--tx);}
+.fr.on{background:rgba(88,166,255,.1);color:var(--ac);border-left-color:var(--ac);}
+.fr .fn{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.fr .dx{opacity:0;background:none;border:none;color:var(--re);cursor:pointer;
+  font-size:14px;padding:0 2px;transition:opacity .1s;line-height:1;}
+.fr:hover .dx{opacity:1;}
+.sbfoot{padding:9px 11px;border-top:1px solid var(--bd);}
 
-  #doc-title-input {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-family: var(--font-body);
-    font-size: 14px;
-    font-weight: 500;
-    padding: 6px 12px;
-    border-radius: 6px;
-    width: 280px;
-    outline: none;
-    transition: border-color 0.15s;
-  }
-  #doc-title-input:focus { border-color: var(--accent); }
+/* EDITOR */
+#edwrap{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--bg);}
+.etabs{height:33px;background:var(--sf);border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;padding:0 7px;gap:1px;overflow-x:auto;flex-shrink:0;}
+.etabs::-webkit-scrollbar{height:0;}
+.etab{display:flex;align-items:center;gap:4px;padding:0 12px;height:100%;
+  font-size:12px;font-weight:500;color:var(--tx3);cursor:pointer;
+  border-bottom:2px solid transparent;transition:all .12s;white-space:nowrap;}
+.etab:hover{color:var(--tx2);}.etab.on{color:var(--ac);border-bottom-color:var(--ac);}
+#cmc{flex:1;overflow:hidden;position:relative;}
+.CodeMirror{height:100%!important;font-family:var(--mono)!important;font-size:13.5px!important;
+  line-height:1.7!important;background:#0e1117!important;color:#e6edf3!important;}
+.CodeMirror-scroll{padding:8px 0;}
+.CodeMirror-gutters{background:#0e1117!important;border-right:1px solid var(--bd)!important;}
+.CodeMirror-linenumber{color:var(--tx3)!important;padding:0 10px 0 6px!important;}
+.CodeMirror-cursor{border-left:2px solid var(--ac)!important;}
+.CodeMirror-selected{background:rgba(88,166,255,.18)!important;}
+.CodeMirror-dialog{background:var(--sf2)!important;border-bottom:1px solid var(--bd)!important;
+  color:var(--tx)!important;padding:5px 12px!important;}
+.CodeMirror-dialog input{background:var(--sf3)!important;border:1px solid var(--bd)!important;
+  color:var(--tx)!important;border-radius:4px!important;padding:3px 8px!important;outline:none!important;}
 
-  .header-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+/* RESIZER */
+#rzr{width:4px;background:var(--bd);cursor:col-resize;flex-shrink:0;transition:background .15s;}
+#rzr:hover,#rzr.on{background:var(--ac);}
 
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 7px 14px;
-    border-radius: 6px;
-    font-family: var(--font-body);
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    border: none;
-    transition: all 0.15s;
-    white-space: nowrap;
-  }
-  .btn-ghost {
-    background: transparent;
-    color: var(--text2);
-    border: 1px solid var(--border);
-  }
-  .btn-ghost:hover { background: var(--surface2); color: var(--text); border-color: var(--border2); }
+/* PREVIEW */
+#pvwrap{width:48%;display:flex;flex-direction:column;flex-shrink:0;background:#e8e8e6;}
+.pvh{height:33px;background:var(--sf);border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;padding:0 11px;gap:7px;flex-shrink:0;}
+.pvt{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--tx3);flex:1;}
+#pvscroll{flex:1;overflow-y:auto;padding:22px 18px;display:flex;
+  flex-direction:column;align-items:center;}
+#pvscroll::-webkit-scrollbar{width:7px;}
+#pvscroll::-webkit-scrollbar-track{background:#d0d0ce;}
+#pvscroll::-webkit-scrollbar-thumb{background:#aaa;border-radius:99px;}
 
-  .btn-primary {
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    color: #fff;
-  }
-  .btn-primary:hover { opacity: 0.85; transform: translateY(-1px); }
+/* PAPER */
+#paper{
+  width:100%;max-width:710px;background:#fff;min-height:960px;
+  box-shadow:0 2px 18px rgba(0,0,0,.14),0 6px 36px rgba(0,0,0,.07);
+  padding:78px 88px;
+  font-family:'Latin Modern Roman','Computer Modern',Georgia,'Times New Roman',serif;
+  font-size:11.5pt;line-height:1.75;color:#1a1a1a;
+}
+#paper .pt{font-size:17pt;font-weight:700;text-align:center;margin-bottom:8px;line-height:1.3;}
+#paper .pau{font-size:11pt;text-align:center;margin-bottom:3px;}
+#paper .paf{font-size:10pt;text-align:center;color:#555;font-style:italic;margin-bottom:3px;}
+#paper .pae{font-size:10pt;text-align:center;color:#777;margin-bottom:3px;}
+#paper .pdt{font-size:10pt;text-align:center;color:#888;margin-bottom:22px;}
+#paper .prule{border:none;border-top:1px solid #ccc;margin:0 0 18px;}
+#paper .pabs{margin:0 26px 22px;border:1px solid #ccc;padding:13px 17px;background:#fafafa;}
+#paper .pabst{font-weight:700;text-align:center;margin-bottom:7px;font-size:10.5pt;
+  text-transform:uppercase;letter-spacing:.4px;}
+#paper .pabs p{font-size:10pt;line-height:1.65;text-align:justify;margin:0;}
+#paper h1{font-size:13.5pt;font-weight:700;margin:24px 0 7px;}
+#paper h2{font-size:12pt;font-weight:700;margin:17px 0 5px;}
+#paper h3{font-size:11.5pt;font-weight:700;font-style:italic;margin:13px 0 4px;}
+#paper h4{font-size:11.5pt;font-weight:700;margin:10px 0 3px;}
+#paper p{margin-bottom:9px;text-align:justify;}
+#paper ul,#paper ol{margin:7px 0 9px 26px;}
+#paper dl{margin:7px 0 9px 0;}
+#paper dt{font-weight:700;}
+#paper dd{margin:0 0 5px 18px;}
+#paper li{margin-bottom:3px;}
+#paper .mdisp{text-align:center;margin:15px 0;overflow-x:auto;padding:3px 0;}
+#paper table{border-collapse:collapse;margin:15px auto;font-size:10.5pt;}
+#paper td,#paper th{border:1px solid #999;padding:5px 13px;}
+#paper th{font-weight:700;background:#f0f0f0;}
+#paper .fw{text-align:center;margin:16px auto;}
+#paper .fp{width:260px;height:140px;border:1px dashed #bbb;background:#f8f8f8;
+  display:inline-flex;align-items:center;justify-content:center;color:#aaa;
+  font-size:10pt;font-style:italic;}
+#paper .cap{font-size:9.5pt;color:#555;margin-top:4px;text-align:center;}
+#paper .vb{background:#f4f4f4;border:1px solid #ddd;padding:9px 13px;font-family:monospace;
+  font-size:9.5pt;margin:10px 0;white-space:pre-wrap;overflow-x:auto;line-height:1.5;}
+#paper .ci{font-family:monospace;background:#f0f0f0;padding:1px 5px;border-radius:3px;font-size:9.5pt;}
+#paper a{color:#1155cc;}
+#paper .bibs{margin-top:26px;padding-top:14px;border-top:1px solid #ccc;}
+#paper .bibe{font-size:9.5pt;margin-bottom:6px;text-indent:-1.4em;padding-left:1.4em;line-height:1.5;}
+#paper .fnsep{border:none;border-top:1px solid #bbb;margin-top:26px;margin-bottom:7px;}
+#paper .fns{font-size:9pt;color:#444;}
+#paper .empty{text-align:center;color:#aaa;font-style:italic;padding:60px 0;font-size:11pt;}
 
-  .btn-success {
-    background: var(--accent3);
-    color: #000;
-    font-weight: 600;
-  }
-  .btn-success:hover { opacity: 0.85; transform: translateY(-1px); }
+/* STATUS */
+#status{height:26px;background:var(--sf);border-top:1px solid var(--bd);
+  display:flex;align-items:center;padding:0 13px;gap:16px;font-size:11px;
+  color:var(--tx3);flex-shrink:0;}
+.sd{width:6px;height:6px;border-radius:50%;background:var(--gr);flex-shrink:0;}
+.sd.busy{background:var(--ye);animation:pu 1s infinite;}
+.sd.err{background:var(--re);}
+@keyframes pu{0%,100%{opacity:1}50%{opacity:.3}}
+.si{display:flex;align-items:center;gap:4px;}
+.sp{flex:1;}
 
-  .btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+/* FOOTER */
+#footer{background:linear-gradient(135deg,#090c12,#0e1420);border-top:1px solid var(--bd);
+  padding:13px 26px;display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:9px;flex-shrink:0;}
+.fm{font-size:12.5px;color:var(--tx2);line-height:1.5;}
+.fm strong{background:linear-gradient(90deg,var(--ac),var(--pu));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.flinks{display:flex;gap:14px;}
+.flink{color:var(--tx3);text-decoration:none;font-size:12px;transition:color .15s;}
+.flink:hover{color:var(--ac);}
 
-  /* ── TOOLBAR ── */
-  #toolbar {
-    height: var(--toolbar-h);
-    background: var(--surface2);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    padding: 0 12px;
-    gap: 2px;
-    overflow-x: auto;
-    position: relative;
-    z-index: 99;
-  }
-  #toolbar::-webkit-scrollbar { height: 3px; }
-  #toolbar::-webkit-scrollbar-track { background: transparent; }
-  #toolbar::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
+/* MODALS */
+.mb{position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(5px);
+  z-index:1000;display:none;align-items:center;justify-content:center;}
+.mb.open{display:flex;}
+.mo{background:var(--sf);border:1px solid var(--bd2);border-radius:12px;padding:26px;
+  max-width:540px;width:92vw;animation:mi .2s ease;position:relative;}
+@keyframes mi{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.mo h2{font-family:var(--disp);font-size:20px;margin-bottom:13px;}
+.mc{position:absolute;top:15px;right:15px;background:none;border:none;
+  color:var(--tx2);cursor:pointer;font-size:20px;line-height:1;}
+.mc:hover{color:var(--tx);}
+.mf{margin-top:18px;display:flex;justify-content:flex-end;gap:8px;}
+.tg{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:3px;}
+.tc{background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:13px;
+  cursor:pointer;transition:all .15s;}
+.tc:hover{border-color:var(--ac);background:rgba(88,166,255,.07);}
+.tc h3{font-size:12.5px;font-weight:600;color:var(--tx);margin-bottom:3px;}
+.tc p{font-size:11px;color:var(--tx2);line-height:1.45;}
+.scg{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:3px;}
+.scr{display:flex;justify-content:space-between;align-items:center;padding:5px 0;
+  border-bottom:1px solid var(--bd);font-size:12px;}
+.scr:last-child{border-bottom:none;}
+kbd{background:var(--sf3);border:1px solid var(--bd2);border-radius:4px;
+  padding:2px 6px;font-family:var(--mono);font-size:10px;color:var(--ac);}
+.fi{width:100%;background:var(--sf2);border:1px solid var(--bd);color:var(--tx);
+  padding:7px 10px;border-radius:6px;font-size:13px;font-family:var(--sans);outline:none;}
+.fi:focus{border-color:var(--ac);}
+.fl{font-size:12px;color:var(--tx2);display:block;margin-bottom:3px;}
+.fg{margin-bottom:10px;}
 
-  .tb-group {
-    display: flex;
-    align-items: center;
-    gap: 1px;
-  }
-  .tb-sep {
-    width: 1px;
-    height: 24px;
-    background: var(--border);
-    margin: 0 6px;
-  }
-  .tb-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 5px 9px;
-    border: none;
-    background: transparent;
-    color: var(--text2);
-    border-radius: 5px;
-    cursor: pointer;
-    font-family: var(--font-body);
-    font-size: 12px;
-    font-weight: 500;
-    transition: all 0.12s;
-    white-space: nowrap;
-  }
-  .tb-btn:hover { background: var(--surface3); color: var(--text); }
-  .tb-btn.active { background: var(--accent); color: #fff; }
-  .tb-btn svg { width: 13px; height: 13px; }
-
-  /* ── MAIN LAYOUT ── */
-  #main {
-    display: flex;
-    height: calc(100vh - var(--header-h) - var(--toolbar-h));
-    overflow: hidden;
-  }
-
-  /* ── FILE SIDEBAR ── */
-  #file-sidebar {
-    width: var(--sidebar-w);
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    flex-shrink: 0;
-    transition: width 0.2s;
-  }
-  #file-sidebar.collapsed { width: 0; overflow: hidden; }
-
-  .sidebar-header {
-    padding: 12px 14px 10px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .sidebar-title {
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--text3);
-  }
-
-  .file-tree {
-    flex: 1;
-    overflow-y: auto;
-    padding: 8px 0;
-  }
-  .file-tree::-webkit-scrollbar { width: 4px; }
-  .file-tree::-webkit-scrollbar-track { background: transparent; }
-  .file-tree::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
-
-  .file-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 14px;
-    cursor: pointer;
-    color: var(--text2);
-    font-size: 13px;
-    transition: all 0.1s;
-    border-left: 2px solid transparent;
-  }
-  .file-item:hover { background: var(--surface2); color: var(--text); }
-  .file-item.active {
-    background: rgba(108,142,245,0.12);
-    color: var(--accent);
-    border-left-color: var(--accent);
-  }
-  .file-item svg { width: 14px; height: 14px; flex-shrink: 0; }
-
-  /* ── EDITOR PANE ── */
-  #editor-pane {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    background: var(--bg);
-    position: relative;
-  }
-
-  .editor-tabs {
-    display: flex;
-    align-items: center;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0 8px;
-    height: 36px;
-    gap: 2px;
-  }
-  .editor-tab {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 0 12px;
-    height: 100%;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text3);
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: all 0.12s;
-    white-space: nowrap;
-  }
-  .editor-tab:hover { color: var(--text2); }
-  .editor-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-
-  .editor-wrapper {
-    flex: 1;
-    display: flex;
-    overflow: hidden;
-    position: relative;
-  }
-
-  .line-numbers {
-    padding: 16px 0;
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-    min-width: 48px;
-    text-align: right;
-    color: var(--text3);
-    font-family: var(--font-mono);
-    font-size: 13px;
-    line-height: 1.65;
-    overflow: hidden;
-    user-select: none;
-    padding-right: 12px;
-    padding-left: 8px;
-  }
-
-  #latex-editor {
-    flex: 1;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: var(--text);
-    font-family: var(--font-mono);
-    font-size: 13.5px;
-    line-height: 1.65;
-    padding: 16px;
-    resize: none;
-    overflow-y: auto;
-    tab-size: 2;
-    white-space: pre;
-    overflow-wrap: normal;
-    overflow-x: auto;
-    caret-color: var(--accent);
-  }
-  #latex-editor::-webkit-scrollbar { width: 6px; height: 6px; }
-  #latex-editor::-webkit-scrollbar-track { background: transparent; }
-  #latex-editor::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
-  #latex-editor::selection { background: rgba(108,142,245,0.3); }
-
-  /* ── PREVIEW PANE ── */
-  #preview-pane {
-    width: 50%;
-    background: #fff;
-    border-left: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    flex-shrink: 0;
-    position: relative;
-  }
-
-  .preview-header {
-    height: 36px;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    padding: 0 12px;
-    gap: 8px;
-  }
-  .preview-title {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text3);
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    flex: 1;
-  }
-
-  .preview-actions { display: flex; gap: 6px; align-items: center; }
-
-  #preview-scroll {
-    flex: 1;
-    overflow-y: auto;
-    background: #f0f0f0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-    gap: 20px;
-  }
-  #preview-scroll::-webkit-scrollbar { width: 6px; }
-  #preview-scroll::-webkit-scrollbar-track { background: #e0e0e0; }
-  #preview-scroll::-webkit-scrollbar-thumb { background: #bbb; border-radius: 99px; }
-
-  #preview-page {
-    width: 100%;
-    max-width: 680px;
-    background: #fff;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.18);
-    border-radius: 2px;
-    padding: 72px 80px;
-    min-height: 880px;
-    font-family: 'Computer Modern', 'Latin Modern', Georgia, serif;
-    font-size: 11pt;
-    line-height: 1.8;
-    color: #111;
-  }
-
-  #preview-page .doc-title {
-    font-size: 18pt;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 6px;
-    line-height: 1.3;
-  }
-  #preview-page .doc-author {
-    font-size: 11pt;
-    text-align: center;
-    margin-bottom: 4px;
-  }
-  #preview-page .doc-date {
-    font-size: 10pt;
-    text-align: center;
-    color: #555;
-    margin-bottom: 20px;
-  }
-  #preview-page .doc-abstract {
-    margin: 0 30px 20px;
-    border: 1px solid #ccc;
-    padding: 12px 16px;
-    font-size: 10pt;
-  }
-  #preview-page .doc-abstract-title {
-    font-weight: bold;
-    text-align: center;
-    font-size: 10pt;
-    margin-bottom: 6px;
-  }
-  #preview-page h1 { font-size: 14pt; margin: 20px 0 8px; font-weight: bold; }
-  #preview-page h2 { font-size: 12pt; margin: 16px 0 6px; font-weight: bold; }
-  #preview-page h3 { font-size: 11pt; margin: 12px 0 4px; font-weight: bold; font-style: italic; }
-  #preview-page p { margin-bottom: 10px; text-align: justify; }
-  #preview-page .math-block { text-align: center; margin: 14px 0; overflow-x: auto; }
-  #preview-page .math-inline { display: inline; }
-  #preview-page ul, #preview-page ol { margin: 8px 0 8px 28px; }
-  #preview-page li { margin-bottom: 4px; }
-  #preview-page .ref-list { margin-top: 20px; }
-  #preview-page .ref-item { font-size: 9.5pt; margin-bottom: 6px; }
-  #preview-page table { border-collapse: collapse; margin: 14px auto; font-size: 10pt; }
-  #preview-page td, #preview-page th { border: 1px solid #999; padding: 5px 12px; }
-  #preview-page th { font-weight: bold; background: #f5f5f5; }
-  #preview-page .figure { text-align: center; margin: 16px 0; }
-  #preview-page .caption { font-size: 9.5pt; color: #444; margin-top: 4px; }
-  #preview-page .hrule { border: none; border-top: 1px solid #ccc; margin: 16px 0; }
-  #preview-page .verbatim { background: #f5f5f5; border: 1px solid #ddd; padding: 10px 14px; font-family: monospace; font-size: 9.5pt; margin: 10px 0; white-space: pre-wrap; }
-  #preview-page .bold { font-weight: bold; }
-  #preview-page .italic { font-style: italic; }
-  #preview-page .underline { text-decoration: underline; }
-  #preview-page .code-inline { font-family: monospace; background: #f0f0f0; padding: 1px 5px; border-radius: 3px; font-size: 9.5pt; }
-  #preview-page .footnote { font-size: 9pt; color: #555; border-top: 1px solid #ccc; margin-top: 30px; padding-top: 6px; }
-
-  /* ── STATUS BAR ── */
-  #statusbar {
-    height: 26px;
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    padding: 0 14px;
-    gap: 20px;
-    font-size: 11px;
-    color: var(--text3);
-    position: relative;
-    z-index: 99;
-  }
-  .status-item { display: flex; align-items: center; gap: 4px; }
-  .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent3); }
-  .status-dot.compiling { background: var(--yellow); animation: pulse 1s infinite; }
-  .status-dot.error { background: var(--red); }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-
-  /* ── FOOTER ── */
-  #footer {
-    background: linear-gradient(135deg, #0a0c12, #111525);
-    border-top: 1px solid var(--border);
-    padding: 18px 32px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px;
-    position: relative;
-    z-index: 100;
-    flex-shrink: 0;
-  }
-
-  .footer-brand {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .footer-heart {
-    font-size: 13px;
-    color: var(--text3);
-    line-height: 1.5;
-  }
-  .footer-heart strong {
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  .footer-heart em { color: var(--accent3); font-style: normal; }
-
-  .footer-links {
-    display: flex;
-    gap: 20px;
-    align-items: center;
-  }
-  .footer-link {
-    color: var(--text3);
-    text-decoration: none;
-    font-size: 12px;
-    transition: color 0.15s;
-  }
-  .footer-link:hover { color: var(--accent); }
-
-  /* ── MODALS ── */
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(6px);
-    z-index: 1000;
-    display: none;
-    align-items: center;
-    justify-content: center;
-  }
-  .modal-overlay.open { display: flex; }
-  .modal {
-    background: var(--surface);
-    border: 1px solid var(--border2);
-    border-radius: 12px;
-    padding: 28px 32px;
-    max-width: 520px;
-    width: 90vw;
-    animation: modal-in 0.2s ease;
-  }
-  @keyframes modal-in { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-  .modal-title { font-family: var(--font-display); font-size: 20px; margin-bottom: 16px; color: var(--text); }
-  .modal-close {
-    position: absolute;
-    top: 18px; right: 18px;
-    background: none; border: none;
-    color: var(--text3); cursor: pointer; font-size: 20px;
-  }
-  .modal-close:hover { color: var(--text); }
-  .modal-body { color: var(--text2); font-size: 14px; line-height: 1.7; margin-bottom: 20px; }
-  .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
-
-  /* ── TOAST ── */
-  #toast {
-    position: fixed;
-    bottom: 60px;
-    right: 20px;
-    background: var(--surface3);
-    border: 1px solid var(--border2);
-    color: var(--text);
-    padding: 10px 18px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 500;
-    opacity: 0;
-    transform: translateY(8px);
-    transition: all 0.2s;
-    z-index: 9999;
-    pointer-events: none;
-    max-width: 320px;
-  }
-  #toast.show { opacity: 1; transform: translateY(0); }
-
-  /* ── SYMBOL PICKER ── */
-  #symbol-panel {
-    position: absolute;
-    top: 48px;
-    left: 0;
-    right: 0;
-    background: var(--surface2);
-    border-bottom: 1px solid var(--border);
-    padding: 10px 14px;
-    display: none;
-    flex-wrap: wrap;
-    gap: 4px;
-    z-index: 50;
-    max-height: 120px;
-    overflow-y: auto;
-  }
-  #symbol-panel.open { display: flex; }
-  .sym-btn {
-    padding: 4px 8px;
-    background: var(--surface3);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    color: var(--text);
-    font-family: var(--font-mono);
-    font-size: 13px;
-    cursor: pointer;
-    transition: all 0.1s;
-  }
-  .sym-btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
-
-  /* ── DRAG RESIZER ── */
-  #resizer {
-    width: 4px;
-    background: var(--border);
-    cursor: col-resize;
-    flex-shrink: 0;
-    transition: background 0.15s;
-    position: relative;
-    z-index: 10;
-  }
-  #resizer:hover, #resizer.dragging { background: var(--accent); }
-
-  /* ── COMPILE SPINNER ── */
-  .spinner {
-    width: 12px; height: 12px;
-    border: 2px solid var(--border2);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.6s linear infinite;
-    display: none;
-  }
-  .spinner.active { display: inline-block; }
-  @keyframes spin { to{transform:rotate(360deg)} }
-
-  /* ── KEYBOARD SHORTCUTS PANEL ── */
-  .shortcuts-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-top: 8px;
-  }
-  .shortcut-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 6px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 12px;
-  }
-  .shortcut-item kbd {
-    background: var(--surface3);
-    border: 1px solid var(--border2);
-    border-radius: 4px;
-    padding: 2px 6px;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--accent);
-  }
-
-  /* scrollbar global */
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
-
-  /* print styles for PDF */
-  @media print {
-    #header, #toolbar, #file-sidebar, #editor-pane, #statusbar, #footer { display: none !important; }
-    #preview-pane { width: 100%; border: none; }
-    #preview-page { box-shadow: none; padding: 0; }
-  }
+/* TOAST */
+#toast{position:fixed;bottom:52px;right:16px;background:var(--sf3);
+  border:1px solid var(--bd2);color:var(--tx);padding:9px 15px;
+  border-radius:8px;font-size:12.5px;font-weight:500;opacity:0;
+  transform:translateY(6px);transition:all .2s;z-index:9999;pointer-events:none;}
+#toast.show{opacity:1;transform:none;}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
-<div id="header">
+<div id="hdr">
   <a class="logo" href="#">
-    <div class="logo-icon">Lx</div>
-    <div class="logo-text">Latex<span>ify</span></div>
+    <div class="lm">Lx</div>
+    <div class="ln">Latex<span>ify</span></div>
   </a>
-  <span class="badge-free">Free Forever</span>
-
-  <div class="header-center">
-    <input id="doc-title-input" type="text" value="Untitled Research Paper" placeholder="Document title…">
-  </div>
-
-  <div class="header-actions">
-    <button class="btn btn-ghost" onclick="toggleShortcuts()">
+  <span class="fb">Free Forever</span>
+  <input id="doc-title" type="text" value="Untitled Research Paper" placeholder="Document title…">
+  <div class="hdr-r">
+    <button class="btn bg" onclick="openM('msc')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8"/></svg>
       Shortcuts
     </button>
-    <button class="btn btn-ghost" onclick="insertTemplate('ieee')">
+    <button class="btn bg" onclick="openM('mtpl')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
       Templates
     </button>
-    <button class="btn btn-primary" onclick="compileLatex()">
+    <button class="btn bp" id="cbtn" onclick="compile()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
       Compile
     </button>
-    <button class="btn btn-success" onclick="downloadPDF()">
+    <button class="btn bgr" onclick="downloadPDF()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Download PDF
     </button>
   </div>
 </div>
 
-<!-- TOOLBAR -->
-<div id="toolbar">
-  <!-- Text formatting -->
-  <div class="tb-group">
-    <button class="tb-btn" onclick="insertSnippet('\\\\textbf{', '}')" title="Bold">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/></svg>
-      Bold
-    </button>
-    <button class="tb-btn" onclick="insertSnippet('\\\\textit{', '}')" title="Italic">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="15" y1="4" x2="9" y2="20"/></svg>
-      Italic
-    </button>
-    <button class="tb-btn" onclick="insertSnippet('\\\\underline{', '}')" title="Underline">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3"/><line x1="4" y1="21" x2="20" y2="21"/></svg>
-      Underline
-    </button>
-    <button class="tb-btn" onclick="insertSnippet('\\\\texttt{', '}')" title="Monospace">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-      Code
-    </button>
-  </div>
-  <div class="tb-sep"></div>
-
-  <!-- Math -->
-  <div class="tb-group">
-    <button class="tb-btn" onclick="insertSnippet('$', '$')" title="Inline Math">∫ Inline</button>
-    <button class="tb-btn" onclick="insertBlock('\\\\[\n', '\n\\\\]')" title="Display Math">∑ Display</button>
-    <button class="tb-btn" onclick="insertBlock('\\\\begin{equation}\n', '\n\\\\end{equation}')" title="Equation">Eq.</button>
-    <button class="tb-btn" onclick="insertBlock('\\\\begin{align}\n  & \\\\\\\\\n', '\n\\\\end{align}')" title="Align">Align</button>
-    <button class="tb-btn" id="sym-toggle-btn" onclick="toggleSymbols()" title="Symbols">Σ Symbols</button>
-  </div>
-  <div class="tb-sep"></div>
-
-  <!-- Sections -->
-  <div class="tb-group">
-    <button class="tb-btn" onclick="insertLine('\\\\section{Section Title}')" title="Section">§ Section</button>
-    <button class="tb-btn" onclick="insertLine('\\\\subsection{Subsection}')" title="Subsection">§§ Subsec</button>
-    <button class="tb-btn" onclick="insertLine('\\\\subsubsection{}')" title="Subsubsection">§§§</button>
-  </div>
-  <div class="tb-sep"></div>
-
-  <!-- Environments -->
-  <div class="tb-group">
-    <button class="tb-btn" onclick="insertBlock('\\\\begin{itemize}\n  \\\\item ', '\n\\\\end{itemize}')" title="Bullet list">• List</button>
-    <button class="tb-btn" onclick="insertBlock('\\\\begin{enumerate}\n  \\\\item ', '\n\\\\end{enumerate}')" title="Numbered list">1. Enum</button>
-    <button class="tb-btn" onclick="insertBlock('\\\\begin{figure}[h]\n\\\\centering\n% \\\\includegraphics[width=0.8\\\\textwidth]{}\n\\\\caption{Caption}\n\\\\label{fig:label}\n', '\\\\end{figure}')" title="Figure">Fig</button>
-    <button class="tb-btn" onclick="insertBlock('\\\\begin{table}[h]\n\\\\centering\n\\\\begin{tabular}{|c|c|c|}\n\\\\hline\nCol 1 & Col 2 & Col 3 \\\\\\\\\n\\\\hline\na & b & c \\\\\\\\\n\\\\hline\n\\\\end{tabular}\n\\\\caption{Table caption}\n\\\\label{tab:label}\n', '\\\\end{table}')" title="Table">⊞ Table</button>
-    <button class="tb-btn" onclick="insertBlock('\\\\begin{verbatim}\n', '\n\\\\end{verbatim}')" title="Verbatim">{ } Verb</button>
-  </div>
-  <div class="tb-sep"></div>
-
-  <!-- Cross-refs -->
-  <div class="tb-group">
-    <button class="tb-btn" onclick="insertSnippet('\\\\ref{', '}')" title="Reference">\\ref</button>
-    <button class="tb-btn" onclick="insertSnippet('\\\\cite{', '}')" title="Citation">\\cite</button>
-    <button class="tb-btn" onclick="insertSnippet('\\\\label{', '}')" title="Label">\\label</button>
-    <button class="tb-btn" onclick="insertLine('\\\\footnote{}')" title="Footnote">†Foot</button>
-  </div>
-  <div class="tb-sep"></div>
-
-  <!-- View -->
-  <div class="tb-group">
-    <button class="tb-btn" id="btn-split" onclick="setLayout('split')" title="Split view">⬜ Split</button>
-    <button class="tb-btn" id="btn-editor" onclick="setLayout('editor')" title="Editor only">✎ Editor</button>
-    <button class="tb-btn" id="btn-preview" onclick="setLayout('preview')" title="Preview only">👁 Preview</button>
-  </div>
+<div id="tb">
+  <span class="tl">Format</span>
+  <button class="tb" onclick="wrap('\\textbf{','}')" title="Bold Ctrl+B"><b>B</b></button>
+  <button class="tb" onclick="wrap('\\textit{','}')" title="Italic Ctrl+I"><i>I</i></button>
+  <button class="tb" onclick="wrap('\\underline{','}')" title="Underline"><u>U</u></button>
+  <button class="tb" onclick="wrap('\\texttt{','}')" title="Typewriter">TT</button>
+  <button class="tb" onclick="wrap('\\textsc{','}')" title="Small Caps">SC</button>
+  <button class="tb" onclick="wrap('\\emph{','}')" title="Emphasis">em</button>
+  <div class="ts"></div>
+  <span class="tl">Math</span>
+  <button class="tb" onclick="wrap('$','$')" title="Inline math Ctrl+M">$x$</button>
+  <button class="tb" onclick="iblock('\\[\n  ','  \n\\]')" title="Display math">$$</button>
+  <button class="tb" onclick="iblock('\\begin{equation}\n  ','  \n\\end{equation}')" title="Equation env">eq</button>
+  <button class="tb" onclick="iblock('\\begin{align}\n  a &= b \\\\\n  c &= d\n\\end{align}',null)" title="Align">align</button>
+  <button class="tb" onclick="wrap('\\frac{','}{b}')" title="Fraction">a/b</button>
+  <button class="tb" onclick="wrap('\\sqrt{','}')" title="Square root">&#x221a;</button>
+  <button class="tb" onclick="ins('\\sum_{i=1}^{n} ')" title="Sum">&Sigma;</button>
+  <button class="tb" onclick="ins('\\int_{a}^{b} ')" title="Integral">&int;</button>
+  <button class="tb" onclick="ins('\\lim_{x \\to \\infty} ')" title="Limit">lim</button>
+  <button class="tb" onclick="iblock('\\begin{cases}\n  a & \\text{if } x > 0 \\\\\n  b & \\text{otherwise}\n\\end{cases}',null)" title="Cases">cases</button>
+  <button class="tb" id="symtb" onclick="toggleSym()" title="Symbol palette">&#x3A3; Symbols &#x25BE;</button>
+  <div class="ts"></div>
+  <span class="tl">Sections</span>
+  <button class="tb" onclick="ins('\\section{')" title="Section">&sect;</button>
+  <button class="tb" onclick="ins('\\subsection{')" title="Subsection">&sect;&sect;</button>
+  <button class="tb" onclick="ins('\\subsubsection{')" title="Subsubsection">&sect;&sect;&sect;</button>
+  <button class="tb" onclick="ins('\\paragraph{')" title="Paragraph">&para;</button>
+  <div class="ts"></div>
+  <span class="tl">Environments</span>
+  <button class="tb" onclick="iblock('\\begin{itemize}\n  \\item First item\n  \\item Second item\n\\end{itemize}',null)" title="Bullet list">&#x2022; List</button>
+  <button class="tb" onclick="iblock('\\begin{enumerate}\n  \\item First item\n  \\item Second item\n\\end{enumerate}',null)" title="Numbered list">1. List</button>
+  <button class="tb" onclick="openM('mtbl')" title="Table wizard">&#x229E; Table</button>
+  <button class="tb" onclick="iblock('\\begin{figure}[h]\n\\centering\n%\\includegraphics[width=0.8\\textwidth]{filename.png}\n\\caption{Your caption here.}\n\\label{fig:label}\n\\end{figure}',null)" title="Figure">Fig</button>
+  <button class="tb" onclick="iblock('\\begin{verbatim}\ncode here\n\\end{verbatim}',null)" title="Verbatim">verb</button>
+  <button class="tb" onclick="iblock('\\begin{theorem}\n  ','  \n\\end{theorem}')" title="Theorem">Thm</button>
+  <button class="tb" onclick="iblock('\\begin{proof}\n  ','  \n\\end{proof}')" title="Proof">Prf</button>
+  <div class="ts"></div>
+  <span class="tl">Refs</span>
+  <button class="tb" onclick="wrap('\\cite{','}')" title="Citation">\\cite</button>
+  <button class="tb" onclick="wrap('\\ref{','}')" title="Reference">\\ref</button>
+  <button class="tb" onclick="wrap('\\label{','}')" title="Label">\\label</button>
+  <button class="tb" onclick="ins('\\footnote{')" title="Footnote">&#x2020;fn</button>
+  <div class="ts"></div>
+  <span class="tl">View</span>
+  <button class="tb" id="vs" onclick="setV('split')">Split</button>
+  <button class="tb" id="ve" onclick="setV('ed')">Edit</button>
+  <button class="tb" id="vp" onclick="setV('pv')">Preview</button>
+  <button class="tb" onclick="toggleSB()">&#9776; Files</button>
+  <div id="sym-panel"></div>
 </div>
 
-<!-- SYMBOL PANEL -->
-<div id="symbol-panel">
-</div>
-
-<!-- MAIN LAYOUT -->
-<div id="main">
-
-  <!-- FILE SIDEBAR -->
-  <div id="file-sidebar">
-    <div class="sidebar-header">
-      <span class="sidebar-title">Files</span>
-      <button class="tb-btn" onclick="addFile()" title="New file" style="padding:3px 7px">+</button>
+<div id="app">
+  <div id="sb">
+    <div class="sbh">
+      <span class="sbt">Files</span>
+      <button class="tb" onclick="newFile()" style="padding:2px 8px;font-size:13px" title="New file">+</button>
     </div>
-    <div class="file-tree" id="file-tree"></div>
-  </div>
-
-  <!-- EDITOR PANE -->
-  <div id="editor-pane">
-    <div class="editor-tabs" id="editor-tabs"></div>
-    <div class="editor-wrapper">
-      <div class="line-numbers" id="line-numbers">1</div>
-      <textarea id="latex-editor" spellcheck="false" autocorrect="off" autocapitalize="off"></textarea>
+    <div id="flist"></div>
+    <div class="sbfoot">
+      <button class="btn bg sm" style="width:100%" onclick="openM('mtpl')">+ From Template</button>
     </div>
   </div>
 
-  <!-- RESIZER -->
-  <div id="resizer"></div>
-
-  <!-- PREVIEW PANE -->
-  <div id="preview-pane">
-    <div class="preview-header">
-      <span class="preview-title">Preview</span>
-      <div class="preview-actions">
-        <div class="spinner" id="compile-spinner"></div>
-        <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px" onclick="compileLatex()">↺ Refresh</button>
-        <button class="btn btn-success" style="padding:4px 10px;font-size:11px" onclick="downloadPDF()">⬇ PDF</button>
-      </div>
-    </div>
-    <div id="preview-scroll">
-      <div id="preview-page">
-        <div style="text-align:center; color:#999; margin-top:80px; font-style:italic">
-          Click <strong>Compile</strong> or press <strong>Ctrl+Enter</strong> to preview your document
-        </div>
-      </div>
-    </div>
+  <div id="edwrap">
+    <div class="etabs" id="etabs"></div>
+    <div id="cmc"></div>
   </div>
 
-</div>
+  <div id="rzr"></div>
 
-<!-- STATUS BAR -->
-<div id="statusbar">
-  <div class="status-item">
-    <div class="status-dot" id="status-dot"></div>
-    <span id="status-text">Ready</span>
+  <div id="pvwrap">
+    <div class="pvh">
+      <span class="pvt">Preview</span>
+      <span id="cs" style="font-size:11px;color:var(--tx3)">Not compiled</span>
+      <button class="btn bg sm" style="margin-left:7px" onclick="compile()">&#x21BA; Recompile</button>
+      <button class="btn bgr sm" style="margin-left:4px" onclick="downloadPDF()">&#x2193; PDF</button>
+    </div>
+    <div id="pvscroll">
+      <div id="paper"><div class="empty">Press <strong>Ctrl+Enter</strong> or click <strong>Compile</strong> to preview your document.</div></div>
+    </div>
   </div>
-  <div class="status-item">Line: <span id="cursor-line">1</span>, Col: <span id="cursor-col">1</span></div>
-  <div class="status-item">Words: <span id="word-count">0</span></div>
-  <div class="status-item">Chars: <span id="char-count">0</span></div>
-  <div class="status-item" id="last-compiled"></div>
-  <div style="flex:1"></div>
-  <div class="status-item" style="color:var(--accent3)">Auto-save: ON</div>
-  <div class="status-item">LaTeX 2e</div>
 </div>
 
-<!-- FOOTER -->
+<div id="status">
+  <div class="si"><div class="sd" id="sdot"></div><span id="stxt">Ready</span></div>
+  <div class="si">Ln&nbsp;<span id="sln">1</span>&nbsp;Col&nbsp;<span id="scol">1</span></div>
+  <div class="si">Words:&nbsp;<span id="swds">0</span></div>
+  <div class="si">Chars:&nbsp;<span id="schs">0</span></div>
+  <div class="si" id="stime"></div>
+  <div class="sp"></div>
+  <div class="si" style="color:var(--gr)">Auto-save ON</div>
+  <div class="si">LaTeX&nbsp;2e</div>
+  <div class="si">UTF-8</div>
+</div>
+
 <div id="footer">
-  <div class="footer-brand">
-    <div class="logo-icon" style="width:24px;height:24px;font-size:11px">Lx</div>
-    <div class="footer-heart">
-      Crafted with <em>♥</em> by <strong>Avikam</strong> &nbsp;·&nbsp;
-      Free forever for every researcher chasing something <em>astonishing</em> &nbsp;·&nbsp;
-      <em>Science belongs to everyone.</em>
-    </div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="lm" style="width:24px;height:24px;font-size:10px">Lx</div>
+    <div class="fm">Made with <span style="color:#f85149">&#x2665;</span> by <strong>Avikam</strong> &nbsp;&middot;&nbsp; Free forever for every researcher chasing something <em>astonishing</em> &nbsp;&middot;&nbsp; <em>Science belongs to everyone. Go discover something remarkable.</em></div>
   </div>
-  <div class="footer-links">
-    <a href="#" class="footer-link">About</a>
-    <a href="#" class="footer-link">GitHub</a>
-    <a href="#" class="footer-link">Feedback</a>
-    <a href="#" class="footer-link">Privacy</a>
+  <div class="flinks">
+    <a href="#" class="flink">About</a>
+    <a href="#" class="flink">GitHub</a>
+    <a href="#" class="flink">Feedback</a>
+  </div>
+</div>
+
+<!-- TEMPLATES MODAL -->
+<div class="mb" id="mtpl" onclick="if(event.target===this)closeM('mtpl')">
+  <div class="mo">
+    <button class="mc" onclick="closeM('mtpl')">&#x00D7;</button>
+    <h2>Choose a Template</h2>
+    <div class="tg">
+      <div class="tc" onclick="loadTpl('article')"><h3>&#x1F4C4; Research Article</h3><p>Standard academic paper with abstract, equations and bibliography.</p></div>
+      <div class="tc" onclick="loadTpl('ieee')"><h3>&#x1F3DB; IEEE Conference</h3><p>Two-column IEEE format for conference submissions.</p></div>
+      <div class="tc" onclick="loadTpl('beamer')"><h3>&#x1F39E; Beamer Slides</h3><p>Presentation slides with frames and math blocks.</p></div>
+      <div class="tc" onclick="loadTpl('report')"><h3>&#x1F4D1; Thesis / Report</h3><p>Multi-chapter report with TOC and appendices.</p></div>
+      <div class="tc" onclick="loadTpl('letter')"><h3>&#x2709; Cover Letter</h3><p>Professional academic cover letter format.</p></div>
+      <div class="tc" onclick="loadTpl('cv')"><h3>&#x1F464; Academic CV</h3><p>Curriculum vitae with publications sections.</p></div>
+    </div>
+    <div class="mf"><button class="btn bg" onclick="closeM('mtpl')">Cancel</button></div>
   </div>
 </div>
 
 <!-- SHORTCUTS MODAL -->
-<div class="modal-overlay" id="shortcuts-modal" onclick="if(event.target===this)toggleShortcuts()">
-  <div class="modal" style="max-width:640px;position:relative">
-    <button class="modal-close" onclick="toggleShortcuts()">×</button>
-    <div class="modal-title">Keyboard Shortcuts</div>
-    <div class="shortcuts-grid">
-      <div class="shortcut-item"><span>Compile / Preview</span><kbd>Ctrl+Enter</kbd></div>
-      <div class="shortcut-item"><span>Download PDF</span><kbd>Ctrl+Shift+D</kbd></div>
-      <div class="shortcut-item"><span>Bold</span><kbd>Ctrl+B</kbd></div>
-      <div class="shortcut-item"><span>Italic</span><kbd>Ctrl+I</kbd></div>
-      <div class="shortcut-item"><span>Inline Math</span><kbd>Ctrl+M</kbd></div>
-      <div class="shortcut-item"><span>Save</span><kbd>Ctrl+S</kbd></div>
-      <div class="shortcut-item"><span>Undo</span><kbd>Ctrl+Z</kbd></div>
-      <div class="shortcut-item"><span>Redo</span><kbd>Ctrl+Y</kbd></div>
-      <div class="shortcut-item"><span>Comment Line</span><kbd>Ctrl+/</kbd></div>
-      <div class="shortcut-item"><span>Find</span><kbd>Ctrl+F</kbd></div>
-      <div class="shortcut-item"><span>Tab Indent</span><kbd>Tab</kbd></div>
-      <div class="shortcut-item"><span>Toggle Symbols</span><kbd>Ctrl+Shift+S</kbd></div>
+<div class="mb" id="msc" onclick="if(event.target===this)closeM('msc')">
+  <div class="mo" style="max-width:580px">
+    <button class="mc" onclick="closeM('msc')">&#x00D7;</button>
+    <h2>Keyboard Shortcuts</h2>
+    <div class="scg">
+      <div class="scr"><span>Compile</span><kbd>Ctrl+Enter</kbd></div>
+      <div class="scr"><span>Download PDF</span><kbd>Ctrl+Shift+D</kbd></div>
+      <div class="scr"><span>Save</span><kbd>Ctrl+S</kbd></div>
+      <div class="scr"><span>Bold</span><kbd>Ctrl+B</kbd></div>
+      <div class="scr"><span>Italic</span><kbd>Ctrl+I</kbd></div>
+      <div class="scr"><span>Inline Math</span><kbd>Ctrl+M</kbd></div>
+      <div class="scr"><span>Find</span><kbd>Ctrl+F</kbd></div>
+      <div class="scr"><span>Find &amp; Replace</span><kbd>Ctrl+H</kbd></div>
+      <div class="scr"><span>Comment Line</span><kbd>Ctrl+/</kbd></div>
+      <div class="scr"><span>Undo</span><kbd>Ctrl+Z</kbd></div>
+      <div class="scr"><span>Redo</span><kbd>Ctrl+Y</kbd></div>
+      <div class="scr"><span>Symbol Palette</span><kbd>Ctrl+Shift+S</kbd></div>
+      <div class="scr"><span>New File</span><kbd>Ctrl+Shift+N</kbd></div>
+      <div class="scr"><span>Toggle Files</span><kbd>Ctrl+\</kbd></div>
     </div>
-    <div class="modal-actions" style="margin-top:20px">
-      <button class="btn btn-primary" onclick="toggleShortcuts()">Got it</button>
+    <div class="mf"><button class="btn bp" onclick="closeM('msc')">Got it</button></div>
+  </div>
+</div>
+
+<!-- TABLE MODAL -->
+<div class="mb" id="mtbl" onclick="if(event.target===this)closeM('mtbl')">
+  <div class="mo" style="max-width:360px">
+    <button class="mc" onclick="closeM('mtbl')">&#x00D7;</button>
+    <h2>Table Wizard</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:10px">
+      <div><label class="fl">Rows</label><input class="fi" type="number" id="trows" value="3" min="1" max="20"></div>
+      <div><label class="fl">Columns</label><input class="fi" type="number" id="tcols" value="3" min="1" max="20"></div>
+    </div>
+    <div class="fg"><label class="fl">Caption</label><input class="fi" type="text" id="tcap" value="Table caption" placeholder="Caption…"></div>
+    <label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer;margin-bottom:7px"><input type="checkbox" id="thdr" checked> Header row (bold)</label>
+    <label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer"><input type="checkbox" id="tbor" checked> Show borders</label>
+    <div class="mf">
+      <button class="btn bg" onclick="closeM('mtbl')">Cancel</button>
+      <button class="btn bp" onclick="doTable()">Insert Table</button>
     </div>
   </div>
 </div>
 
-<!-- TOAST -->
 <div id="toast"></div>
 
-<!-- Raw LaTeX default content stored here to avoid JS string escape issues -->
-<script type="text/template" id="default-tex">\documentclass[12pt,a4paper]{article}
+<!-- ═══════════════════════════════════════════════════════
+     TEMPLATE DATA — raw LaTeX, no JS escaping needed
+════════════════════════════════════════════════════════ -->
+<script type="text/template" id="tpl-article">
+\documentclass[12pt,a4paper]{article}
 \usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
 \usepackage{amsmath, amssymb, amsthm}
 \usepackage{graphicx}
 \usepackage{hyperref}
-\usepackage{geometry}
-\geometry{margin=1in}
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
 
-% ---- Document Metadata ----
-\title{My Research Paper: A Comprehensive Study\\
-\large Subtitle Goes Here}
-\author{Author Name\\
-\textit{Department of Science, University of Research}\\
-\texttt{author@university.edu}}
+\title{My Research Paper: A Comprehensive Study}
+\author{Author Name\\[4pt]
+\textit{Department of Science, University Name}\\
+\small\texttt{author@university.edu}}
 \date{\today}
 
 \begin{document}
@@ -916,7 +492,7 @@ for future research in this domain. All code and data are publicly available.
 \section{Introduction}
 Research is the systematic investigation of materials and sources to establish
 facts and reach new conclusions. In this paper, we explore the fundamental
-aspects of our proposed method \cite{reference2024}.
+aspects of our proposed method~\cite{ref1}.
 
 The main contributions of this work are:
 \begin{enumerate}
@@ -926,833 +502,1031 @@ The main contributions of this work are:
 \end{enumerate}
 
 \section{Related Work}
-Previous work by Smith et al. \cite{smith2023} proposed an early approach.
-Our method builds upon these foundations but introduces key improvements.
+Previous work by Smith et al.~\cite{ref2} proposed an early approach.
+Our method builds upon these foundations but introduces key improvements
+in both efficiency and accuracy.
 
 \section{Methodology}
 \subsection{Problem Formulation}
-Let $\mathcal{X} = \{x_1, x_2, \ldots, x_n\}$ be the input space.
-We define our objective function as:
-
+Let $\mathcal{X} = \{x_1, x_2, \ldots, x_n\}$ be the input space and
+$\mathcal{Y}$ the output space. We define our objective function as:
 \[
-  \mathcal{L}(\theta) = \frac{1}{n} \sum_{i=1}^{n} \ell(f_\theta(x_i), y_i) + \lambda \|\theta\|_2^2
+  \mathcal{L}(\theta) = \frac{1}{n} \sum_{i=1}^{n}
+  \ell\!\left(f_\theta(x_i),\, y_i\right) + \lambda \|\theta\|_2^2
 \]
-
 where $\lambda > 0$ is the regularization parameter and $f_\theta$ denotes
-our model parameterized by $\theta$.
+our model parameterized by $\theta \in \mathbb{R}^d$.
 
-\subsection{Algorithm}
-The update rule at step $t$ is given by:
-
+\subsection{Optimization}
+The parameter update at step $t$ follows:
 \begin{equation}
-  \theta^{(t+1)} = \theta^{(t)} - \eta_t \nabla_\theta \mathcal{L}(\theta^{(t)})
+  \theta^{(t+1)} = \theta^{(t)} - \eta_t \,\nabla_\theta \mathcal{L}(\theta^{(t)})
   \label{eq:update}
 \end{equation}
-
-Equation \ref{eq:update} shows the standard gradient descent update.
+Equation~\eqref{eq:update} describes standard stochastic gradient descent.
 
 \section{Experiments}
-\subsection{Datasets}
-We evaluate our method on three standard benchmarks:
+\subsection{Datasets and Setup}
+We evaluate our method on three standard benchmarks.
 
 \begin{table}[h]
 \centering
-\begin{tabular}{|l|c|c|c|}
-\hline
+\begin{tabular}{lrrr}
+\toprule
 \textbf{Dataset} & \textbf{Train} & \textbf{Test} & \textbf{Classes} \\
-\hline
-Dataset A & 50,000 & 10,000 & 10 \\
-Dataset B & 60,000 & 6,000 & 100 \\
-Dataset C & 73,257 & 26,032 & 10 \\
-\hline
+\midrule
+CIFAR-10  & 50{,}000 & 10{,}000 & 10 \\
+CIFAR-100 & 50{,}000 & 10{,}000 & 100 \\
+ImageNet  & 1.2M     & 50{,}000 & 1000 \\
+\bottomrule
 \end{tabular}
-\caption{Summary of benchmark datasets used in our evaluation.}
+\caption{Summary of benchmark datasets.}
 \label{tab:datasets}
 \end{table}
 
 \subsection{Results}
-Our method achieves state-of-the-art performance with \textbf{94.2\%} accuracy
-on Dataset A, significantly outperforming existing approaches.
-
-The improvement is statistically significant with $p < 0.01$ under a
-two-tailed $t$-test.
+Our method achieves \textbf{94.2\%} accuracy on CIFAR-10, outperforming
+all baseline methods. The improvement is statistically significant
+($p < 0.01$, two-tailed $t$-test).
 
 \section{Conclusion}
-In this work, we presented a novel approach to the problem. Experimental
-results demonstrate the effectiveness of our method. Future work will
-explore extensions to larger-scale settings.
+We presented a novel approach with strong empirical results. Future work
+will explore extensions to larger-scale and multi-modal settings.
 
 \begin{thebibliography}{9}
-\bibitem{reference2024} J. Doe and A. Smith, ``A Method for Research,''
-  \textit{Journal of Science}, vol. 42, pp. 1--15, 2024.
-\bibitem{smith2023} A. Smith, ``Early Approaches,''
-  \textit{Proc. Conf. on AI}, 2023.
+\bibitem{ref1} J.~Doe and A.~Smith, ``A Novel Method,''
+  \textit{J.\ Machine Learning Research}, vol.~25, pp.~1--20, 2024.
+\bibitem{ref2} A.~Smith, ``Earlier Approaches,''
+  \textit{Proc.\ ICML}, pp.~100--110, 2023.
 \end{thebibliography}
 
 \end{document}
 </script>
 
-<script type="text/template" id="tpl-ieee">\documentclass[conference]{IEEEtran}
+<script type="text/template" id="tpl-ieee">
+\documentclass[conference]{IEEEtran}
 \usepackage{amsmath,amssymb}
-\title{IEEE Conference Paper Template}
-\author{\IEEEauthorblockN{Author Name}
-\IEEEauthorblockA{Department\\University\\email@domain.com}}
+\usepackage{graphicx}
+\usepackage{cite}
+
+\title{IEEE Conference Paper Title}
+\author{
+\IEEEauthorblockN{First Author}
+\IEEEauthorblockA{Dept.\ of Electrical Engineering\\
+University Name, City, Country\\
+email@domain.com}
+\and
+\IEEEauthorblockN{Second Author}
+\IEEEauthorblockA{Dept.\ of Computer Science\\
+University Name, City, Country\\
+email2@domain.com}
+}
+
 \begin{document}
 \maketitle
+
 \begin{abstract}
-Abstract text here. This paper presents a novel contribution to the field.
+Abstract goes here. Summarize the paper's key contributions,
+methodology and main results in 150--250 words.
 \end{abstract}
+
+\begin{IEEEkeywords}
+keyword1, keyword2, keyword3
+\end{IEEEkeywords}
+
 \section{Introduction}
-Introduction text. Motivation and background go here.
+Introduce the problem and your contributions here.
+
 \section{Related Work}
-Prior work summary.
-\section{Methodology}
-Our proposed method is defined as:
+Discuss prior art and how your work differs.
+
+\section{Proposed Method}
+Describe your approach. Key equation:
 \[
-  y = f(x; \theta)
+  y = W x + b, \quad W \in \mathbb{R}^{m \times n}
 \]
-\section{Experiments}
-Experimental setup and results.
+
+\section{Experimental Results}
+Present results with tables and figures.
+
 \section{Conclusion}
-Conclusion and future work.
+Summarize your findings and outline future directions.
+
 \begin{thebibliography}{1}
-\bibitem{ref1} Author, ``Title,'' \textit{Journal}, 2024.
+\bibitem{b1}
+G.~Eason, B.~Noble, I.~N.~Sneddon, ``On certain integrals,''
+\textit{Phil.\ Trans.\ Roy.\ Soc.\ London}, vol.~A247, pp.~529--551, 1955.
 \end{thebibliography}
+
 \end{document}
 </script>
 
-<script type="text/template" id="tpl-beamer">\documentclass{beamer}
+<script type="text/template" id="tpl-beamer">
+\documentclass{beamer}
 \usetheme{Madrid}
-\title{Presentation Title}
-\subtitle{Subtitle Here}
-\author{Author Name}
-\institute{University Name}
+\usecolortheme{default}
+\usepackage{amsmath}
+\usepackage{graphicx}
+
+\title{Your Presentation Title}
+\subtitle{A Descriptive Subtitle}
+\author{Your Name}
+\institute{Department of Science \\ University Name}
 \date{\today}
+
 \begin{document}
+
 \begin{frame}
-\titlepage
+  \titlepage
 \end{frame}
+
 \begin{frame}{Outline}
-\tableofcontents
+  \tableofcontents
 \end{frame}
+
 \section{Introduction}
-\begin{frame}{Introduction}
-\begin{itemize}
-  \item First point
-  \item Second point
-  \item Third point
-\end{itemize}
+\begin{frame}{Motivation}
+  \begin{itemize}
+    \item Why is this problem important?
+    \item What gap does our work address?
+    \item What are our key contributions?
+  \end{itemize}
 \end{frame}
+
+\section{Background}
+\begin{frame}{Related Work}
+  Prior approaches include:
+  \begin{enumerate}
+    \item Method A by Author et al.\ (2022)
+    \item Method B by Another et al.\ (2023)
+  \end{enumerate}
+  \vspace{6pt}
+  Our approach improves upon these in \textbf{three key ways}.
+\end{frame}
+
+\section{Method}
+\begin{frame}{Proposed Method}
+  \begin{block}{Objective Function}
+    \[
+      \mathcal{L}(\theta) = \frac{1}{n}\sum_{i=1}^n
+      \ell(f_\theta(x_i), y_i) + \lambda\|\theta\|^2
+    \]
+  \end{block}
+  \begin{itemize}
+    \item $f_\theta$: our parameterized model
+    \item $\lambda$: regularization coefficient
+  \end{itemize}
+\end{frame}
+
 \section{Results}
-\begin{frame}{Main Result}
-Our key equation:
-\[E = mc^2\]
-This leads to important conclusions.
+\begin{frame}{Experimental Results}
+  \begin{columns}
+    \column{0.5\textwidth}
+      \begin{itemize}
+        \item Dataset: CIFAR-10
+        \item Accuracy: \textbf{94.2\%}
+        \item Baseline: 91.7\%
+      \end{itemize}
+    \column{0.5\textwidth}
+      [Figure placeholder]
+  \end{columns}
 \end{frame}
+
 \section{Conclusion}
-\begin{frame}{Conclusion}
-\begin{itemize}
-  \item Summary point one
-  \item Summary point two
-  \item Future work directions
-\end{itemize}
+\begin{frame}{Conclusion \& Future Work}
+  \textbf{Summary:}
+  \begin{itemize}
+    \item We proposed a novel method
+    \item Experiments show clear improvements
+  \end{itemize}
+  \vspace{8pt}
+  \textbf{Future Work:}
+  \begin{itemize}
+    \item Scale to larger datasets
+    \item Explore multi-modal settings
+  \end{itemize}
 \end{frame}
+
 \end{document}
 </script>
 
-<script type="text/template" id="tpl-report">\documentclass[12pt,a4paper]{report}
+<script type="text/template" id="tpl-report">
+\documentclass[12pt,a4paper]{report}
 \usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
 \usepackage{amsmath, amssymb}
 \usepackage{graphicx}
-\usepackage{geometry}
-\geometry{margin=1in}
-\title{Research Report}
-\author{Your Name}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+
+\title{\textbf{Research Report}\\[0.8ex]
+\large A Detailed Investigation into [Topic]}
+\author{Your Name\\
+Supervisor: Prof.\ Supervisor Name\\[4pt]
+\textit{Department of Science, University Name}}
 \date{\today}
+
 \begin{document}
+
 \maketitle
 \tableofcontents
+
 \chapter{Introduction}
-This report investigates an important research problem. Background and motivation.
+
+\section{Background and Motivation}
+Provide context and motivation for the study.
+
+\section{Research Objectives}
+\begin{enumerate}
+  \item Objective one
+  \item Objective two
+  \item Objective three
+\end{enumerate}
+
+\section{Report Structure}
+Chapter 2 reviews the literature. Chapter 3 describes the methodology.
+Chapter 4 presents results. Chapter 5 concludes.
+
 \chapter{Literature Review}
-Survey of existing work. Key references and their contributions.
+
+\section{Existing Approaches}
+Summary of existing work and key references.
+
+\section{Research Gaps}
+Identify what is missing in the current literature.
+
 \chapter{Methodology}
-Description of methods used. Mathematical formulation:
+
+\section{Experimental Setup}
+Description of experimental setup.
+
+\section{Mathematical Formulation}
 \[
-  f(x) = \int_{-\infty}^{\infty} \hat{f}(\xi) e^{2\pi i \xi x} d\xi
+  \bar{x} = \frac{1}{n}\sum_{i=1}^{n} x_i, \qquad
+  s^2 = \frac{1}{n-1}\sum_{i=1}^{n}(x_i - \bar{x})^2
 \]
-\chapter{Results}
-Presentation of results, tables, and figures.
+
+\chapter{Results and Discussion}
+
+\section{Main Results}
+Present your findings here.
+
+\section{Analysis and Discussion}
+Interpret and discuss your results.
+
 \chapter{Conclusion}
-Summary of findings and directions for future research.
+
+\section{Summary of Findings}
+Summarize the key findings.
+
+\section{Future Work}
+Directions for future research.
+
+\appendix
+\chapter{Additional Tables and Figures}
+Supplementary material goes here.
+
+\end{document}
+</script>
+
+<script type="text/template" id="tpl-letter">
+\documentclass[12pt]{letter}
+\usepackage[margin=1in]{geometry}
+\signature{Your Full Name \\ Your Title \\ Department, University}
+\address{Your Name \\ Department of Science \\ University Name \\ City, Country \\ your@email.com}
+
+\begin{document}
+
+\begin{letter}{
+Prof.\ Editor Name \\
+Editor-in-Chief \\
+\textit{Journal Name} \\
+Publisher, City}
+
+\opening{Dear Prof.\ Editor Name,}
+
+I am writing to submit our manuscript titled \textbf{``Your Paper Title''} for
+consideration for publication in \textit{Journal Name}.
+
+This work addresses the important problem of [describe the problem]. Our
+main contributions are:
+\begin{itemize}
+  \item A novel theoretical framework that [describe contribution 1].
+  \item An efficient algorithm that achieves [describe contribution 2].
+  \item Extensive experiments demonstrating [describe contribution 3].
+\end{itemize}
+
+This manuscript reports original research that has not been previously published
+and is not under consideration for publication elsewhere. All authors have
+read and approved the manuscript.
+
+We believe this work will be of significant interest to the readers of
+\textit{Journal Name}. We look forward to your response.
+
+\closing{Yours sincerely,}
+
+\end{letter}
+\end{document}
+</script>
+
+<script type="text/template" id="tpl-cv">
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=0.9in]{geometry}
+\usepackage{hyperref}
+\usepackage{enumitem}
+
+\begin{document}
+
+{\centering
+{\Huge \textbf{Your Full Name}} \\[5pt]
+Department of Science, University Name \\
+\href{mailto:you@university.edu}{you@university.edu} \quad
+\href{https://yoursite.com}{yoursite.com} \quad
++1 (555) 123-4567 \\[8pt]
+}
+\hrule
+\vspace{8pt}
+
+\textbf{\large Research Interests} \\
+Machine learning, computer vision, natural language processing,
+reinforcement learning.
+
+\vspace{8pt}
+\textbf{\large Education}
+
+\begin{itemize}[leftmargin=*, label={}]
+\item \textbf{Ph.D.\ Computer Science}, University Name \hfill 2020--Present \\
+Advisor: Prof.\ Name. Dissertation: \textit{Deep Learning for [Topic]}.
+\item \textbf{M.Sc.\ Computer Science}, University Name \hfill 2018--2020
+\item \textbf{B.Sc.\ Mathematics}, University Name \hfill 2014--2018
+\end{itemize}
+
+\vspace{8pt}
+\textbf{\large Publications}
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Your Name}, Co-Author Name, ``Paper Title,''
+\textit{Conference or Journal Name}, Year.
+\item \textbf{Your Name}, Co-Author Name, ``Another Paper,''
+\textit{Conference or Journal Name}, Year.
+\end{enumerate}
+
+\vspace{8pt}
+\textbf{\large Research Experience}
+
+\textbf{Research Assistant}, Lab Name, University \hfill 2020--Present \\
+Brief description of work.
+
+\vspace{8pt}
+\textbf{\large Awards and Fellowships}
+
+Best Paper Award, Conference Name, Year. \\
+Graduate Fellowship, Funding Agency, 2020--2022.
+
+\vspace{8pt}
+\textbf{\large Teaching}
+
+Teaching Assistant, Course Name (undergraduate), University, 2021.
+
+\vspace{8pt}
+\textbf{\large Technical Skills}
+
+\textbf{Languages:} Python, C++, MATLAB, R, Julia \\
+\textbf{Frameworks:} PyTorch, TensorFlow, JAX, Hugging Face \\
+\textbf{Tools:} Git, Docker, Slurm, \LaTeX
+
 \end{document}
 </script>
 
 <script>
-// ══════════════════════════════════════════════════════════
+'use strict';
+
+// ═══════════════════════
 //  STATE
-// ══════════════════════════════════════════════════════════
-const state = {
-  files: {},
-  activeFile: 'main.tex',
-  layout: 'split',
-  autoCompileTimer: null,
-};
+// ═══════════════════════
+const S = { files:{}, active:'main.tex', view:'split', sbOpen:true, cTimer:null, sTimer:null };
+let cm = null;
 
-// DEFAULT_TEX is loaded from the hidden #default-tex script tag to avoid JS string escape issues
-const DEFAULT_TEX = document.getElementById('default-tex').textContent;
-
-// Templates loaded from hidden script tags to avoid JS backslash escape issues
-const TEMPLATES = {
-  ieee:   document.getElementById('tpl-ieee').textContent,
-  beamer: document.getElementById('tpl-beamer').textContent,
-  report: document.getElementById('tpl-report').textContent,
-};
-
-const SYMBOLS = [
-  ['\\alpha','α'],['\\beta','β'],['\\gamma','γ'],['\\delta','δ'],['\\epsilon','ε'],
-  ['\\zeta','ζ'],['\\eta','η'],['\\theta','θ'],['\\lambda','λ'],['\\mu','μ'],
-  ['\\nu','ν'],['\\xi','ξ'],['\\pi','π'],['\\rho','ρ'],['\\sigma','σ'],
-  ['\\tau','τ'],['\\phi','φ'],['\\chi','χ'],['\\psi','ψ'],['\\omega','ω'],
-  ['\\Gamma','Γ'],['\\Delta','Δ'],['\\Theta','Θ'],['\\Lambda','Λ'],['\\Xi','Ξ'],
-  ['\\Pi','Π'],['\\Sigma','Σ'],['\\Phi','Φ'],['\\Psi','Ψ'],['\\Omega','Ω'],
-  ['\\infty','∞'],['\\partial','∂'],['\\nabla','∇'],['\\forall','∀'],['\\exists','∃'],
-  ['\\in','∈'],['\\notin','∉'],['\\subset','⊂'],['\\supset','⊃'],['\\cup','∪'],
-  ['\\cap','∩'],['\\emptyset','∅'],['\\times','×'],['\\div','÷'],['\\pm','±'],
-  ['\\leq','≤'],['\\geq','≥'],['\\neq','≠'],['\\approx','≈'],['\\equiv','≡'],
-  ['\\rightarrow','→'],['\\leftarrow','←'],['\\Rightarrow','⇒'],['\\Leftarrow','⇐'],
-  ['\\leftrightarrow','↔'],['\\cdot','·'],['\\ldots','…'],['\\cdots','⋯'],
-  ['\\int','∫'],['\\sum','∑'],['\\prod','∏'],['\\sqrt{}','√'],['\\frac{}{}','f/g'],
-];
-
-// ══════════════════════════════════════════════════════════
+// ═══════════════════════
 //  INIT
-// ══════════════════════════════════════════════════════════
-function init() {
-  state.files['main.tex'] = { content: DEFAULT_TEX, name: 'main.tex' };
-  state.files['references.bib'] = { content: `@article{reference2024,
-  author    = {Doe, John and Smith, Anna},
-  title     = {A Method for Research},
-  journal   = {Journal of Science},
-  year      = {2024},
-  volume    = {42},
-  pages     = {1--15},
-}
-
-@inproceedings{smith2023,
-  author    = {Smith, Anna},
-  title     = {Early Approaches},
-  booktitle = {Proceedings of the Conference on AI},
-  year      = {2023},
-}`, name: 'references.bib' };
-
-  renderFileTree();
-  openFile('main.tex');
-  renderSymbols();
-  updateStats();
-
-  // auto-compile on change with debounce
-  const editor = document.getElementById('latex-editor');
-  editor.addEventListener('input', () => {
-    updateLineNumbers();
-    updateStats();
-    autoSave();
-    clearTimeout(state.autoCompileTimer);
-    state.autoCompileTimer = setTimeout(compileLatex, 2000);
+// ═══════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  cm = CodeMirror(document.getElementById('cmc'), {
+    mode:'stex', theme:'dracula', lineNumbers:true,
+    matchBrackets:true, autoCloseBrackets:true,
+    foldGutter:true,
+    gutters:['CodeMirror-linenumbers','CodeMirror-foldgutter'],
+    indentUnit:2, tabSize:2, indentWithTabs:false,
+    lineWrapping:true,
+    extraKeys:{
+      'Ctrl-Enter': () => compile(),
+      'Ctrl-B':     () => wrap('\\textbf{','}'),
+      'Ctrl-I':     () => wrap('\\textit{','}'),
+      'Ctrl-M':     () => wrap('$','$'),
+      'Ctrl-S':     () => { doSave(); toast('Saved \u2713'); },
+      'Ctrl-/':     () => cm.execCommand('toggleComment'),
+      'Ctrl-F':     () => cm.execCommand('findPersistent'),
+      'Ctrl-H':     () => cm.execCommand('replace'),
+      'Ctrl-Shift-D': () => downloadPDF(),
+      'Ctrl-Shift-S': () => toggleSym(),
+      'Ctrl-Shift-N': () => newFile(),
+      'Ctrl-\\':    () => toggleSB(),
+      'Tab':        (c) => c.replaceSelection('  '),
+    },
   });
-  editor.addEventListener('keydown', handleEditorKeydown);
-  editor.addEventListener('keyup', updateCursorPos);
-  editor.addEventListener('click', updateCursorPos);
-  editor.addEventListener('scroll', syncScroll);
 
-  setupResizer();
-  setLayout('split');
-  setTimeout(compileLatex, 500);
+  cm.on('change', () => { updateSt(); schedSave(); schedCompile(); });
+  cm.on('cursorActivity', updateSt);
+
+  // default files
+  mkFile('main.tex', gtpl('article'));
+  mkFile('references.bib', bibDefault());
+  renderSB(); openF('main.tex');
+  buildSyms(); setV('split'); document.getElementById('vs').classList.add('on');
+  setTimeout(compile, 700);
+  setupRzr();
+});
+
+// ═══════════════════════
+//  FILES
+// ═══════════════════════
+function mkFile(n, c='') { S.files[n] = {name:n, content:c}; }
+
+function openF(name) {
+  if (S.active && S.files[S.active]) S.files[S.active].content = cm.getValue();
+  if (!S.files[name]) mkFile(name);
+  S.active = name;
+  cm.setValue(S.files[name].content);
+  cm.clearHistory(); cm.focus();
+  renderSB(); renderTabs(); updateSt();
 }
 
-// ══════════════════════════════════════════════════════════
-//  FILE MANAGEMENT
-// ══════════════════════════════════════════════════════════
-function renderFileTree() {
-  const tree = document.getElementById('file-tree');
-  tree.innerHTML = '';
-  Object.keys(state.files).forEach(name => {
-    const el = document.createElement('div');
-    el.className = 'file-item' + (name === state.activeFile ? ' active' : '');
-    el.innerHTML = `${fileIcon(name)}<span>${name}</span>`;
-    el.onclick = () => openFile(name);
-    tree.appendChild(el);
-  });
+function doSave() {
+  if (S.active && S.files[S.active]) S.files[S.active].content = cm.getValue();
 }
 
-function fileIcon(name) {
-  if (name.endsWith('.tex')) return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
-  if (name.endsWith('.bib')) return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>`;
-  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
+function schedSave() {
+  clearTimeout(S.sTimer);
+  S.sTimer = setTimeout(doSave, 800);
 }
 
-function openFile(name) {
-  // save current file before switching
-  if (state.activeFile && state.files[state.activeFile]) {
-    state.files[state.activeFile].content = document.getElementById('latex-editor').value;
+function newFile() {
+  const n = prompt('File name (e.g. chapter2.tex):');
+  if (!n || !n.trim()) return;
+  const nm = n.trim();
+  if (S.files[nm]) { toast('File already exists'); return; }
+  mkFile(nm, '% ' + nm + '\n');
+  renderSB(); openF(nm); toast('Created ' + nm);
+}
+
+function delFile(name, e) {
+  e.stopPropagation();
+  if (Object.keys(S.files).length <= 1) { toast('Cannot delete the only file'); return; }
+  if (!confirm('Delete "' + name + '"?')) return;
+  delete S.files[name];
+  if (S.active === name) {
+    const f = Object.keys(S.files)[0];
+    S.active = f; cm.setValue(S.files[f].content);
   }
-  state.activeFile = name;
-  // ensure file entry exists
-  if (!state.files[name]) state.files[name] = { content: '', name };
-  document.getElementById('latex-editor').value = state.files[name].content;
-  renderFileTree();
-  renderTabs();
-  updateLineNumbers();
-  updateStats();
+  renderSB(); renderTabs();
 }
 
-function addFile() {
-  const name = prompt('New file name:', 'chapter2.tex');
-  if (!name) return;
-  state.files[name] = { content: `% ${name}\n`, name };
-  renderFileTree();
-  openFile(name);
-  toast(`Created ${name}`);
+function renderSB() {
+  const ul = document.getElementById('flist');
+  ul.innerHTML = '';
+  Object.keys(S.files).forEach(nm => {
+    const d = document.createElement('div');
+    d.className = 'fr' + (nm === S.active ? ' on' : '');
+    const ico = nm.endsWith('.bib') ? '\uD83D\uDCDA' : '\uD83D\uDCC4';
+    d.innerHTML = '<span>' + ico + '</span><span class="fn">' + nm + '</span><button class="dx" title="Delete">\u00D7</button>';
+    d.addEventListener('click', () => openF(nm));
+    d.querySelector('.dx').addEventListener('click', e => delFile(nm, e));
+    ul.appendChild(d);
+  });
 }
 
 function renderTabs() {
-  const tabs = document.getElementById('editor-tabs');
-  tabs.innerHTML = '';
-  Object.keys(state.files).forEach(name => {
-    const tab = document.createElement('div');
-    tab.className = 'editor-tab' + (name === state.activeFile ? ' active' : '');
-    tab.textContent = name;
-    tab.onclick = () => openFile(name);
-    tabs.appendChild(tab);
+  const tc = document.getElementById('etabs');
+  tc.innerHTML = '';
+  Object.keys(S.files).forEach(nm => {
+    const t = document.createElement('div');
+    t.className = 'etab' + (nm === S.active ? ' on' : '');
+    t.textContent = nm;
+    t.addEventListener('click', () => openF(nm));
+    tc.appendChild(t);
   });
 }
 
-// ══════════════════════════════════════════════════════════
-//  EDITOR HELPERS
-// ══════════════════════════════════════════════════════════
-function handleEditorKeydown(e) {
-  const ed = document.getElementById('latex-editor');
-
-  // Ctrl+Enter: compile
-  if (e.ctrlKey && e.key === 'Enter') { e.preventDefault(); compileLatex(); return; }
-  // Ctrl+S: save
-  if (e.ctrlKey && e.key === 's') { e.preventDefault(); autoSave(); toast('Saved ✓'); return; }
-  // Ctrl+B: bold
-  if (e.ctrlKey && e.key === 'b') { e.preventDefault(); insertSnippet('\\textbf{', '}'); return; }
-  // Ctrl+I: italic
-  if (e.ctrlKey && e.key === 'i') { e.preventDefault(); insertSnippet('\\textit{', '}'); return; }
-  // Ctrl+M: inline math
-  if (e.ctrlKey && e.key === 'm') { e.preventDefault(); insertSnippet('$', '$'); return; }
-  // Ctrl+Shift+D: download
-  if (e.ctrlKey && e.shiftKey && e.key === 'D') { e.preventDefault(); downloadPDF(); return; }
-  // Ctrl+Shift+S: symbols
-  if (e.ctrlKey && e.shiftKey && e.key === 'S') { e.preventDefault(); toggleSymbols(); return; }
-  // Ctrl+/: comment
-  if (e.ctrlKey && e.key === '/') {
-    e.preventDefault();
-    const s = ed.selectionStart; const e2 = ed.selectionEnd;
-    const val = ed.value;
-    const lineStart = val.lastIndexOf('\n', s-1) + 1;
-    if (val[lineStart] === '%') {
-      ed.value = val.slice(0, lineStart) + val.slice(lineStart+1);
-      ed.selectionStart = ed.selectionEnd = s - 1;
-    } else {
-      ed.value = val.slice(0, lineStart) + '%' + val.slice(lineStart);
-      ed.selectionStart = ed.selectionEnd = s + 1;
-    }
-    triggerInput(); return;
-  }
-  // Tab: indent
-  if (e.key === 'Tab') {
-    e.preventDefault();
-    const s = ed.selectionStart; const e2 = ed.selectionEnd;
-    ed.value = ed.value.slice(0,s) + '  ' + ed.value.slice(e2);
-    ed.selectionStart = ed.selectionEnd = s+2;
-    triggerInput(); return;
-  }
-  // Auto-close braces
-  const pairs = { '{':'}', '(':')', '[':']', '$':'$' };
-  if (pairs[e.key]) {
-    const s = ed.selectionStart; const e2 = ed.selectionEnd;
-    if (s !== e2) {
-      e.preventDefault();
-      const sel = ed.value.slice(s, e2);
-      ed.value = ed.value.slice(0,s) + e.key + sel + pairs[e.key] + ed.value.slice(e2);
-      ed.selectionStart = s+1; ed.selectionEnd = e2+1;
-      triggerInput();
-    }
-  }
-}
-
-function triggerInput() {
-  document.getElementById('latex-editor').dispatchEvent(new Event('input'));
-}
-
-function insertSnippet(before, after) {
-  const ed = document.getElementById('latex-editor');
-  const s = ed.selectionStart, e2 = ed.selectionEnd;
-  const sel = ed.value.slice(s, e2) || 'text';
-  ed.value = ed.value.slice(0,s) + before + sel + after + ed.value.slice(e2);
-  ed.selectionStart = s + before.length;
-  ed.selectionEnd = s + before.length + sel.length;
-  ed.focus(); triggerInput();
-}
-
-function insertBlock(before, after) {
-  const ed = document.getElementById('latex-editor');
-  const s = ed.selectionStart;
-  const sel = ed.value.slice(s, ed.selectionEnd) || '';
-  const insert = before + sel + after;
-  ed.value = ed.value.slice(0,s) + insert + ed.value.slice(ed.selectionEnd);
-  ed.selectionStart = ed.selectionEnd = s + before.length + sel.length;
-  ed.focus(); triggerInput();
-}
-
-function insertLine(text) {
-  const ed = document.getElementById('latex-editor');
-  const s = ed.selectionStart;
-  const lineEnd = ed.value.indexOf('\n', s);
-  const pos = lineEnd === -1 ? ed.value.length : lineEnd;
-  ed.value = ed.value.slice(0,pos) + '\n' + text + ed.value.slice(pos);
-  ed.selectionStart = ed.selectionEnd = pos + 1 + text.length;
-  ed.focus(); triggerInput();
-}
-
-function insertTemplate(name) {
-  const choice = window.prompt('Choose a template:\n  ieee    — IEEE Conference Paper\n  beamer  — Presentation Slides\n  report  — Research Report\n\nType one of: ieee, beamer, report', 'ieee');
-  if (!choice) return;
-  const key = choice.trim().toLowerCase();
-  if (!TEMPLATES[key]) { toast('Unknown template. Choose: ieee, beamer, report'); return; }
-  if (state.files['main.tex']) state.files['main.tex'].content = TEMPLATES[key];
-  document.getElementById('latex-editor').value = TEMPLATES[key];
-  triggerInput();
-  toast('Template "' + key + '" loaded ✓');
-}
-
-function updateLineNumbers() {
-  const ed = document.getElementById('latex-editor');
-  const lines = ed.value.split('\n').length;
-  const ln = document.getElementById('line-numbers');
-  ln.textContent = Array.from({length: lines}, (_,i) => i+1).join('\n');
-  ln.scrollTop = ed.scrollTop;
-}
-
-function syncScroll() {
-  const ed = document.getElementById('latex-editor');
-  document.getElementById('line-numbers').scrollTop = ed.scrollTop;
-}
-
-function updateCursorPos() {
-  const ed = document.getElementById('latex-editor');
-  const s = ed.selectionStart;
-  const txt = ed.value.slice(0, s);
-  const lines = txt.split('\n');
-  document.getElementById('cursor-line').textContent = lines.length;
-  document.getElementById('cursor-col').textContent = lines[lines.length-1].length + 1;
-}
-
-function updateStats() {
-  const val = document.getElementById('latex-editor').value;
-  const words = val.trim() ? val.trim().split(/\s+/).length : 0;
-  document.getElementById('word-count').textContent = words;
-  document.getElementById('char-count').textContent = val.length;
-}
-
-function autoSave() {
-  if (state.activeFile && state.files[state.activeFile]) {
-    state.files[state.activeFile].content = document.getElementById('latex-editor').value;
-  }
-}
-
-// ══════════════════════════════════════════════════════════
-//  SYMBOLS
-// ══════════════════════════════════════════════════════════
-function renderSymbols() {
-  const panel = document.getElementById('symbol-panel');
-  SYMBOLS.forEach(([cmd, glyph]) => {
-    const btn = document.createElement('button');
-    btn.className = 'sym-btn';
-    btn.title = cmd;
-    btn.textContent = glyph;
-    btn.onclick = () => { insertSnippet(cmd, ''); toggleSymbols(false); };
-    panel.appendChild(btn);
-  });
-}
-
-function toggleSymbols(force) {
-  const panel = document.getElementById('symbol-panel');
-  const btn = document.getElementById('sym-toggle-btn');
-  const open = force !== undefined ? force : !panel.classList.contains('open');
-  panel.classList.toggle('open', open);
-  btn.classList.toggle('active', open);
-}
-
-// ══════════════════════════════════════════════════════════
-//  LAYOUT
-// ══════════════════════════════════════════════════════════
-function setLayout(mode) {
-  state.layout = mode;
-  const ed = document.getElementById('editor-pane');
-  const pv = document.getElementById('preview-pane');
-  const rs = document.getElementById('resizer');
-  ['btn-split','btn-editor','btn-preview'].forEach(id => document.getElementById(id).classList.remove('active'));
-  document.getElementById('btn-'+mode).classList.add('active');
-  if (mode === 'split') {
-    ed.style.display = ''; pv.style.display = ''; rs.style.display = '';
-    pv.style.width = '50%';
-  } else if (mode === 'editor') {
-    ed.style.display = ''; pv.style.display = 'none'; rs.style.display = 'none';
+// ═══════════════════════
+//  EDITOR OPS
+// ═══════════════════════
+function wrap(before, after) {
+  const sel = cm.getSelection();
+  if (sel) {
+    cm.replaceSelection(before + sel + after);
   } else {
-    ed.style.display = 'none'; pv.style.display = ''; rs.style.display = 'none';
-    pv.style.width = '100%';
+    const cur = cm.getCursor();
+    cm.replaceRange(before + 'text' + after, cur);
+    cm.setSelection(
+      {line:cur.line, ch:cur.ch + before.length},
+      {line:cur.line, ch:cur.ch + before.length + 4}
+    );
   }
+  cm.focus();
 }
 
-// ══════════════════════════════════════════════════════════
-//  RESIZER
-// ══════════════════════════════════════════════════════════
-function setupResizer() {
-  const rs = document.getElementById('resizer');
-  const pv = document.getElementById('preview-pane');
-  const main = document.getElementById('main');
-  let dragging = false, startX = 0, startW = 0;
+function ins(text) {
+  cm.replaceRange(text, cm.getCursor());
+  cm.focus();
+}
 
-  rs.addEventListener('mousedown', e => {
-    dragging = true; startX = e.clientX; startW = pv.offsetWidth;
-    rs.classList.add('dragging');
-    document.body.style.userSelect = 'none';
-    document.body.style.cursor = 'col-resize';
-  });
-  document.addEventListener('mousemove', e => {
-    if (!dragging) return;
-    const dx = startX - e.clientX;
-    const newW = Math.max(200, Math.min(main.offsetWidth - 200, startW + dx));
-    pv.style.width = newW + 'px';
-  });
-  document.addEventListener('mouseup', () => {
-    if (!dragging) return;
-    dragging = false; rs.classList.remove('dragging');
-    document.body.style.userSelect = ''; document.body.style.cursor = '';
+function iblock(before, after) {
+  if (after === null) {
+    ins('\n' + before + '\n');
+    return;
+  }
+  const sel = cm.getSelection();
+  const cur = cm.getCursor();
+  const txt = '\n' + before + (sel || '') + after + '\n';
+  cm.replaceRange(txt, cur);
+  cm.focus();
+}
+
+// ═══════════════════════
+//  TABLE WIZARD
+// ═══════════════════════
+function doTable() {
+  const rows = parseInt(document.getElementById('trows').value) || 3;
+  const cols = parseInt(document.getElementById('tcols').value) || 3;
+  const cap  = document.getElementById('tcap').value || 'Caption';
+  const hdr  = document.getElementById('thdr').checked;
+  const bor  = document.getElementById('tbor').checked;
+  const cf   = bor ? '|' + Array(cols).fill('c').join('|') + '|' : Array(cols).fill('c').join('  ');
+  let body = bor ? '\\hline\n' : '';
+  for (let r = 0; r < rows; r++) {
+    const cells = Array(cols).fill(0).map((_,c) =>
+      (r===0 && hdr) ? '\\textbf{Col ' + (c+1) + '}' : 'Cell ' + (r+1) + '-' + (c+1));
+    body += cells.join(' & ') + ' \\\\\n';
+    if (bor && (r===0 && hdr || r===rows-1)) body += '\\hline\n';
+  }
+  const tex = '\n\\begin{table}[h]\n\\centering\n\\begin{tabular}{' + cf + '}\n' +
+    body + '\\end{tabular}\n\\caption{' + cap + '}\n\\label{tab:label}\n\\end{table}\n';
+  ins(tex); closeM('mtbl'); toast('Table inserted');
+}
+
+// ═══════════════════════
+//  SYMBOLS
+// ═══════════════════════
+const SYMS = [
+  ['\\alpha','α'],['\\beta','β'],['\\gamma','γ'],['\\delta','δ'],['\\epsilon','ε'],
+  ['\\zeta','ζ'],['\\eta','η'],['\\theta','θ'],['\\kappa','κ'],['\\lambda','λ'],
+  ['\\mu','μ'],['\\nu','ν'],['\\xi','ξ'],['\\pi','π'],['\\rho','ρ'],
+  ['\\sigma','σ'],['\\tau','τ'],['\\phi','φ'],['\\chi','χ'],['\\psi','ψ'],
+  ['\\omega','ω'],['\\Gamma','Γ'],['\\Delta','Δ'],['\\Theta','Θ'],['\\Lambda','Λ'],
+  ['\\Pi','Π'],['\\Sigma','Σ'],['\\Phi','Φ'],['\\Psi','Ψ'],['\\Omega','Ω'],
+  ['\\infty','∞'],['\\partial','∂'],['\\nabla','∇'],['\\forall','∀'],['\\exists','∃'],
+  ['\\in','∈'],['\\notin','∉'],['\\subset','⊂'],['\\cup','∪'],['\\cap','∩'],
+  ['\\emptyset','∅'],['\\times','×'],['\\div','÷'],['\\pm','±'],['\\mp','∓'],
+  ['\\leq','≤'],['\\geq','≥'],['\\neq','≠'],['\\approx','≈'],['\\equiv','≡'],
+  ['\\sim','∼'],['\\propto','∝'],['\\perp','⊥'],['\\parallel','∥'],
+  ['\\rightarrow','→'],['\\leftarrow','←'],['\\Rightarrow','⇒'],['\\Leftarrow','⇐'],
+  ['\\leftrightarrow','↔'],['\\mapsto','↦'],['\\uparrow','↑'],['\\downarrow','↓'],
+  ['\\cdot','·'],['\\cdots','⋯'],['\\ldots','…'],['\\vdots','⋮'],['\\ddots','⋱'],
+  ['\\int','∫'],['\\iint','∬'],['\\oint','∮'],['\\sum','∑'],['\\prod','∏'],
+  ['\\mathbb{R}','ℝ'],['\\mathbb{N}','ℕ'],['\\mathbb{Z}','ℤ'],['\\mathbb{C}','ℂ'],
+  ['\\mathcal{L}','ℒ'],['\\mathcal{O}','𝒪'],['\\mathcal{F}','ℱ'],['\\mathcal{H}','ℋ'],
+];
+
+function buildSyms() {
+  const p = document.getElementById('sym-panel');
+  SYMS.forEach(([cmd, g]) => {
+    const b = document.createElement('button');
+    b.className='sym'; b.title=cmd; b.textContent=g;
+    b.addEventListener('click', () => { ins(cmd); toggleSym(false); });
+    p.appendChild(b);
   });
 }
 
-// ══════════════════════════════════════════════════════════
-//  LATEX COMPILER (RENDERER)
-// ══════════════════════════════════════════════════════════
-function setStatus(s, type='ok') {
-  const dot = document.getElementById('status-dot');
-  const text = document.getElementById('status-text');
-  const spinner = document.getElementById('compile-spinner');
-  dot.className = 'status-dot' + (type==='compiling' ? ' compiling' : type==='error' ? ' error' : '');
-  text.textContent = s;
-  spinner.classList.toggle('active', type==='compiling');
+function toggleSym(f) {
+  const p = document.getElementById('sym-panel');
+  const b = document.getElementById('symtb');
+  const open = f !== undefined ? f : !p.classList.contains('open');
+  p.classList.toggle('open', open);
+  b.classList.toggle('on', open);
 }
 
-function compileLatex() {
-  autoSave();
-  setStatus('Compiling…', 'compiling');
-  setTimeout(() => {
+// ═══════════════════════
+//  COMPILE
+// ═══════════════════════
+function schedCompile() {
+  clearTimeout(S.cTimer);
+  S.cTimer = setTimeout(compile, 2000);
+}
+
+function setSt(msg, type) {
+  document.getElementById('sdot').className = 'sd' + (type==='busy'?' busy':type==='err'?' err':'');
+  document.getElementById('stxt').textContent = msg;
+  const cs = document.getElementById('cs');
+  if (cs) cs.textContent = msg;
+}
+
+function compile() {
+  doSave();
+  setSt('Compiling\u2026', 'busy');
+  requestAnimationFrame(() => setTimeout(() => {
     try {
-      const editorVal = document.getElementById('latex-editor').value;
-      const src = (state.files['main.tex'] && state.files['main.tex'].content) ? state.files['main.tex'].content : editorVal;
-      const html = latexToHtml(src);
-      document.getElementById('preview-page').innerHTML = html;
-      // re-render MathJax
-      if (window.MathJax) {
-        MathJax.typesetPromise([document.getElementById('preview-page')]).catch(e => console.warn(e));
+      const src = (S.files['main.tex'] && S.files['main.tex'].content) || cm.getValue();
+      document.getElementById('paper').innerHTML = render(src);
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([document.getElementById('paper')]).catch(e => console.warn(e));
       }
-      setStatus('Compiled successfully ✓');
-      const now = new Date(); const t = now.toLocaleTimeString();
-      document.getElementById('last-compiled').textContent = `Last compiled: ${t}`;
-    } catch(err) {
-      setStatus('Compile error: ' + err.message, 'error');
+      setSt('Compiled \u2713', 'ok');
+      document.getElementById('stime').textContent = 'Last: ' + new Date().toLocaleTimeString();
+    } catch(e) {
+      setSt('Error: ' + e.message, 'err');
     }
-  }, 80);
+  }, 60));
 }
 
-// ══════════════════════════════════════════════════════════
-//  LATEX → HTML RENDERER
-// ══════════════════════════════════════════════════════════
-function latexToHtml(src) {
-  // strip comments
-  let s = src.replace(/(?<!\\)%[^\n]*/g, '');
-
-  // extract \begin{document}...\end{document}
-  const docMatch = s.match(/\\begin\{document\}([\s\S]*?)\\end\{document\}/);
-  const body = docMatch ? docMatch[1] : s;
-
-  // extract metadata
-  const titleMatch = s.match(/\\title\{([\s\S]*?)\}/);
-  const authorMatch = s.match(/\\author\{([\s\S]*?)\}/);
-  const dateMatch = s.match(/\\date\{([\s\S]*?)\}/);
-
+// ═══════════════════════
+//  RENDERER
+// ═══════════════════════
+function render(src) {
+  src = src.replace(/(?<!\\)%[^\n]*/g, ''); // strip comments
+  const bm = src.match(/\\begin\{document\}([\s\S]*?)\\end\{document\}/);
+  const body = bm ? bm[1] : src;
+  const meta = {
+    title:    exMeta(src,'title'),
+    author:   exMeta(src,'author'),
+    date:     exMeta(src,'date'),
+  };
   let html = '';
+  if (body.includes('\\maketitle') && meta.title) html += renderTitle(meta);
+  html += renderBody(body);
+  return html || '<div class="empty">Empty document.</div>';
+}
 
-  // maketitle
-  if (s.includes('\\maketitle') && titleMatch) {
-    const titleRaw = titleMatch[1].replace(/\\\\/g,' ').replace(/\\large\s*/,'').trim();
-    html += `<div class="doc-title">${processInline(titleRaw)}</div>`;
-    if (authorMatch) {
-      const authorRaw = authorMatch[1].replace(/\\\\/g,' ').replace(/\\IEEEauthorblockN\{[^}]*\}/g,'').trim();
-      html += `<div class="doc-author">${processInline(authorRaw)}</div>`;
-    }
-    const dateText = dateMatch ? dateMatch[1].replace('\\today', new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})) : '';
-    html += `<div class="doc-date">${processInline(dateText)}</div>`;
-    html += `<hr class="hrule">`;
+function exMeta(src, cmd) {
+  // handle multi-line
+  const m = src.match(new RegExp('\\\\' + cmd + '\\{([\\s\\S]{0,600}?)\\}(?!\\{)'));
+  return m ? m[1].trim() : '';
+}
+
+function renderTitle(m) {
+  let h = '';
+  const tlines = m.title.replace(/\\\\[\s*]*/g, '\n').replace(/\\large\s*/g,'').split('\n');
+  h += '<div class="pt">' + tlines.map(l => inl(l.trim())).filter(Boolean).join('<br>') + '</div>';
+  if (m.author) {
+    const ands = m.author.split(/\\and/);
+    ands.forEach(a => {
+      a.replace(/\\\\[\s*]*/g, '\n').split('\n').filter(l => l.trim()).forEach((l,i) => {
+        l = l.trim();
+        if (!l) return;
+        if (i === 0) h += '<div class="pau"><strong>' + inl(l) + '</strong></div>';
+        else if (/\\textit|\\texttt|\\small|affil|IEEEauthorblock/.test(l))
+          h += '<div class="paf">' + inl(l) + '</div>';
+        else h += '<div class="pae">' + inl(l) + '</div>';
+      });
+    });
   }
-
-  // process body
-  html += processBody(body);
-
-  return html;
+  const ds = m.date
+    ? m.date.replace('\\today', new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}))
+    : new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  h += '<div class="pdt">' + inl(ds) + '</div>';
+  h += '<hr class="prule">';
+  return h;
 }
 
-function processBody(body) {
-  let html = '';
+function renderBody(body) {
+  // protect verbatim
+  const vstore = [];
+  body = body.replace(/\\begin\{(?:verbatim|lstlisting|Verbatim)\}([\s\S]*?)\\end\{(?:verbatim|lstlisting|Verbatim)\}/g, (_,c) => {
+    vstore.push(c); return '%%VB' + (vstore.length-1) + '%%';
+  });
+
   // abstract
-  body = body.replace(/\\begin\{abstract\}([\s\S]*?)\\end\{abstract\}/g, (_, content) => {
-    return `<div class="doc-abstract"><div class="doc-abstract-title">Abstract</div>${processInline(content.trim())}</div>`;
+  body = body.replace(/\\begin\{abstract\}([\s\S]*?)\\end\{abstract\}/g, (_,c) =>
+    '<div class="pabs"><div class="pabst">Abstract</div><p>' + inl(c.trim()) + '</p></div>');
+
+  // display math
+  body = body.replace(/\\\[([\s\S]*?)\\\]/g, (_,m) => '<div class="mdisp">\\[' + m + '\\]</div>');
+  body = body.replace(/\$\$([\s\S]*?)\$\$/g, (_,m) => '<div class="mdisp">$$' + m + '$$</div>');
+  body = body.replace(/\\begin\{(equation|align|gather|multline|eqnarray)(\*?)\}([\s\S]*?)\\end\{\1\2\}/g,
+    (_,e,s,c) => '<div class="mdisp">\\begin{' + e + s + '}' + c + '\\end{' + e + s + '}</div>');
+
+  // tables
+  body = body.replace(/\\begin\{table\}(\[[\w!ht]*\])?([\s\S]*?)\\end\{table\}/g, (_,__,c) => {
+    let cap='';
+    c = c.replace(/\\caption\{([\s\S]*?)\}/,(_,x)=>{cap=x;return '';}).replace(/\\label\{[^}]*\}/g,'').replace(/\\centering/g,'');
+    return '<div class="fw">' + renderTab(c) + '<div class="cap"><strong>Table: </strong>' + inl(cap) + '</div></div>';
   });
 
-  // verbatim (protect first)
-  const verbBlocks = [];
-  body = body.replace(/\\begin\{verbatim\}([\s\S]*?)\\end\{verbatim\}/g, (_, content) => {
-    const idx = verbBlocks.length;
-    verbBlocks.push(content);
-    return `%%VERB${idx}%%`;
+  // figures
+  body = body.replace(/\\begin\{figure\}(\[[\w!ht]*\])?([\s\S]*?)\\end\{figure\}/g, (_,__,c) => {
+    let cap='';
+    c = c.replace(/\\caption\{([\s\S]*?)\}/,(_,x)=>{cap=x;return '';}).replace(/\\label\{[^}]*\}/g,'').replace(/\\centering/g,'')
+         .replace(/\\includegraphics(\[[^\]]*\])?\{[^}]*\}/g,'<div class="fp">[Figure / Image]</div>');
+    return '<div class="fw">' + c.trim() + '<div class="cap"><strong>Figure: </strong>' + inl(cap) + '</div></div>';
   });
 
-  // display math \[ ... \]
-  body = body.replace(/\\\[([\s\S]*?)\\\]/g, (_, math) => `<div class="math-block">\\[${math}\\]</div>`);
-
-  // equation/align/gather environments
-  body = body.replace(/\\begin\{(equation|align|gather|multline)\*?\}([\s\S]*?)\\end\{\1\*?\}/g, (_, env, content) => {
-    return `<div class="math-block">\\begin{${env}}${content}\\end{${env}}</div>`;
-  });
-
-  // table environment
-  body = body.replace(/\\begin\{table\}\[?\w*\]?([\s\S]*?)\\end\{table\}/g, (_, content) => {
-    let caption = '';
-    content = content.replace(/\\caption\{([\s\S]*?)\}/, (_, c) => { caption = c; return ''; });
-    content = content.replace(/\\label\{[^}]*\}/g,'');
-    const tabular = processTabular(content);
-    return `<div class="figure">${tabular}<div class="caption">${processInline(caption)}</div></div>`;
-  });
-
-  // figure environment
-  body = body.replace(/\\begin\{figure\}\[?\w*\]?([\s\S]*?)\\end\{figure\}/g, (_, content) => {
-    let caption = '';
-    content = content.replace(/\\caption\{([\s\S]*?)\}/, (_, c) => { caption = c; return ''; });
-    content = content.replace(/\\label\{[^}]*\}|\\centering/g,'');
-    content = content.replace(/\\includegraphics.*?\{[^}]*\}/g,'<div style="width:200px;height:120px;background:#f0f0f0;margin:auto;display:flex;align-items:center;justify-content:center;color:#999;font-size:10pt;border:1px solid #ccc">[Figure]</div>');
-    return `<div class="figure">${content}<div class="caption">${processInline(caption)}</div></div>`;
+  // theorem-like
+  ['theorem','lemma','proposition','corollary','definition','remark','example','proof'].forEach(env => {
+    const label = env.charAt(0).toUpperCase() + env.slice(1);
+    body = body.replace(new RegExp('\\\\begin\\{' + env + '\\}(\\[[^\\]]*\\])?(\\[\\s*\\S+\\s*\\])?([\s\S]*?)\\\\end\\{' + env + '\\}', 'g'),
+      (_,opt,tit,c) => '<p><strong>' + label + (tit ? ' (' + tit.replace(/[\[\]]/g,'') + ')' : '') + '.</strong> <em>' + inl(c.trim()) + '</em></p>');
   });
 
   // sections
-  body = body.replace(/\\section\*?\{([^}]*)\}/g, (_, t) => `<h1>${processInline(t)}</h1>`);
-  body = body.replace(/\\subsection\*?\{([^}]*)\}/g, (_, t) => `<h2>${processInline(t)}</h2>`);
-  body = body.replace(/\\subsubsection\*?\{([^}]*)\}/g, (_, t) => `<h3>${processInline(t)}</h3>`);
+  let sn=0,ssn=0,sssn=0;
+  body = body.replace(/\\(chapter|section|subsection|subsubsection)\*?\{([^}]*)\}/g, (_,cmd,t) => {
+    const star = _.includes('*');
+    if (cmd==='chapter'||cmd==='section') { if(!star){sn++;ssn=0;sssn=0;} return '<h1>' + (star?'':sn+'. ') + inl(t) + '</h1>'; }
+    if (cmd==='subsection')   { if(!star){ssn++;sssn=0;} return '<h2>' + (star?'':sn+'.'+ssn+' ') + inl(t) + '</h2>'; }
+    if (cmd==='subsubsection'){ if(!star) sssn++; return '<h3>' + (star?'':sn+'.'+ssn+'.'+sssn+' ') + inl(t) + '</h3>'; }
+    return '';
+  });
+  body = body.replace(/\\paragraph\*?\{([^}]*)\}/g, (_,t) => '<p><strong>' + inl(t) + '</strong></p>');
 
-  // lists
-  body = body.replace(/\\begin\{itemize\}([\s\S]*?)\\end\{itemize\}/g, (_, content) => {
-    const items = content.split('\\item').filter(i => i.trim());
-    return '<ul>' + items.map(i => `<li>${processInline(i.trim())}</li>`).join('') + '</ul>';
-  });
-  body = body.replace(/\\begin\{enumerate\}([\s\S]*?)\\end\{enumerate\}/g, (_, content) => {
-    const items = content.split('\\item').filter(i => i.trim());
-    return '<ol>' + items.map(i => `<li>${processInline(i.trim())}</li>`).join('') + '</ol>';
-  });
+  // nested lists (4 passes for nesting)
+  for (let i=0;i<4;i++) {
+    body = body.replace(/\\begin\{itemize\}([\s\S]*?)\\end\{itemize\}/g, (_,c) =>
+      '<ul>' + c.split('\\item').filter(x=>x.trim()).map(x=>'<li>'+inl(x.trim())+'</li>').join('') + '</ul>');
+    body = body.replace(/\\begin\{enumerate\}([\s\S]*?)\\end\{enumerate\}/g, (_,c) =>
+      '<ol>' + c.split('\\item').filter(x=>x.trim()).map(x=>'<li>'+inl(x.trim())+'</li>').join('') + '</ol>');
+    body = body.replace(/\\begin\{description\}([\s\S]*?)\\end\{description\}/g, (_,c) =>
+      '<dl>' + c.split('\\item').filter(x=>x.trim()).map(x => {
+        const m = x.match(/^\[([^\]]*)\]([\s\S]*)/);
+        return m ? '<dt><strong>'+inl(m[1])+'</strong></dt><dd>'+inl(m[2].trim())+'</dd>' : '<dd>'+inl(x.trim())+'</dd>';
+      }).join('') + '</dl>');
+  }
 
   // bibliography
-  body = body.replace(/\\begin\{thebibliography\}\{?\w*\}?([\s\S]*?)\\end\{thebibliography\}/g, (_, content) => {
-    const items = content.split('\\bibitem').filter(i => i.trim());
-    let out = '<h1>References</h1><div class="ref-list">';
-    items.forEach((item, i) => {
-      const label = item.match(/\{([^}]*)\}/);
-      const text = item.replace(/\{[^}]*\}/, '').trim();
-      out += `<div class="ref-item">[${i+1}] ${processInline(text)}</div>`;
+  body = body.replace(/\\begin\{thebibliography\}\{[^}]*\}([\s\S]*?)\\end\{thebibliography\}/g, (_,c) => {
+    const entries = c.split(/\\bibitem/).filter(x=>x.trim());
+    let out = '<div class="bibs"><h1>References</h1>';
+    entries.forEach((e,i) => {
+      const txt = e.replace(/^\{[^}]*\}/,'').trim();
+      out += '<div class="bibe">[' + (i+1) + '] ' + inl(txt) + '</div>';
     });
     return out + '</div>';
   });
 
-  // tableofcontents / maketitle / other commands to strip
-  body = body.replace(/\\(maketitle|tableofcontents|newpage|clearpage|cleardoublepage|noindent|centering)/g, '');
-  body = body.replace(/\\(vspace|hspace|vskip|hskip)\*?\{[^}]*\}/g, '');
+  // footnotes
+  const fns = [];
+  body = body.replace(/\\footnote\{([\s\S]*?)\}/g, (_,c) => { fns.push(c); return '<sup>' + fns.length + '</sup>'; });
 
-  // horizontal rule
-  body = body.replace(/\\(hline|hrule|midrule|toprule|bottomrule)/g, '<hr class="hrule">');
-
-  // paragraph breaks
-  body = body.replace(/\n{2,}/g, '\n\n');
+  // misc
+  body = body
+    .replace(/\\(maketitle|tableofcontents|listoffigures|listoftables|appendix)/g,'')
+    .replace(/\\newpage|\\clearpage|\\cleardoublepage/g,'<div style="page-break-after:always;margin:16px 0;border-top:1px dashed #ddd"></div>')
+    .replace(/\\(hline|midrule|toprule|bottomrule|hrule)/g,'')
+    .replace(/\\(noindent|centering|raggedright|raggedleft|small|large|Large|huge|Huge|normalsize)\b/g,'')
+    .replace(/\\vspace\*?\{[^}]*\}/g,'<div style="margin:12px 0"></div>')
+    .replace(/\\hspace\*?\{[^}]*\}/g,'&ensp;')
+    .replace(/\\\\(\[[\w.]*\])?/g,' ');
 
   // restore verbatim
-  body = body.replace(/%%VERB(\d+)%%/g, (_, i) => `<div class="verbatim">${verbBlocks[i].replace(/</g,'&lt;')}</div>`);
+  body = body.replace(/%%VB(\d+)%%/g, (_,i) => '<div class="vb">' + esc(vstore[+i]) + '</div>');
 
-  // split into paragraphs
-  const paras = body.split('\n\n');
-  let result = '';
-  for (let p of paras) {
-    const trimmed = p.trim();
-    if (!trimmed) continue;
-    if (trimmed.startsWith('<h') || trimmed.startsWith('<ul') || trimmed.startsWith('<ol') ||
-        trimmed.startsWith('<div') || trimmed.startsWith('<hr') || trimmed.startsWith('<table')) {
-      result += trimmed;
-    } else {
-      result += `<p>${processInline(trimmed)}</p>`;
-    }
+  // paragraph split
+  let out = '';
+  for (const chunk of body.split(/\n{2,}/)) {
+    const t = chunk.trim();
+    if (!t) continue;
+    if (/^<(h[1-6]|div|ul|ol|dl|table|blockquote|hr)/i.test(t)) out += t;
+    else out += '<p>' + t + '</p>';
   }
 
-  return html + result;
+  // footnote section
+  if (fns.length) {
+    out += '<hr class="fnsep"><div class="fns">';
+    fns.forEach((f,i) => out += '<div><sup>'+(i+1)+'</sup> ' + inl(f) + '</div>');
+    out += '</div>';
+  }
+
+  return out;
 }
 
-function processTabular(content) {
-  const tabMatch = content.match(/\\begin\{tabular\}\{([^}]*)\}([\s\S]*?)\\end\{tabular\}/);
-  if (!tabMatch) return content;
-  const rows = tabMatch[2].split('\\\\').map(r => r.trim()).filter(r => r && !r.match(/^\\hline$/));
-  let html = '<table>';
-  rows.forEach((row, i) => {
-    row = row.replace(/\\hline/g,'');
-    const cells = row.split('&').map(c => c.trim());
-    const tag = i === 0 ? 'th' : 'td';
-    html += '<tr>' + cells.map(c => `<${tag}>${processInline(c)}</${tag}>`).join('') + '</tr>';
+function renderTab(content) {
+  const m = content.match(/\\begin\{tabular\}\{([^}]*)\}([\s\S]*?)\\end\{tabular\}/);
+  if (!m) return content;
+  const rows = m[2].replace(/\\(?:hline|toprule|midrule|bottomrule|cline\{[^}]*\})/g,'')
+    .split('\\\\').map(r=>r.trim()).filter(Boolean);
+  let h = '<table>';
+  rows.forEach((row,ri) => {
+    const cells = row.split('&').map(c=>c.trim());
+    const tag = ri===0 ? 'th' : 'td';
+    h += '<tr>' + cells.map(c=>'<'+tag+'>'+inl(c)+'</'+tag+'>').join('') + '</tr>';
   });
-  return html + '</table>';
+  return h + '</table>';
 }
 
-function processInline(s) {
+function inl(s) {
   if (!s) return '';
+  // protect inline math from being mangled
+  const ms=[], md=[];
+  s = s.replace(/\$\$[\s\S]*?\$\$/g, m => { md.push(m); return '%%MD'+( md.length-1)+'%%'; });
+  s = s.replace(/\$[^$\n]*?\$/g,    m => { ms.push(m); return '%%MS'+(ms.length-1)+'%%'; });
   s = s
-    // textbf, textit, etc
-    .replace(/\\textbf\{([\s\S]*?)\}/g, '<strong>$1</strong>')
-    .replace(/\\textit\{([\s\S]*?)\}/g, '<em>$1</em>')
-    .replace(/\\emph\{([\s\S]*?)\}/g, '<em>$1</em>')
-    .replace(/\\underline\{([\s\S]*?)\}/g, '<u>$1</u>')
-    .replace(/\\texttt\{([\s\S]*?)\}/g, '<span class="code-inline">$1</span>')
-    .replace(/\\textsc\{([\s\S]*?)\}/g, '<span style="font-variant:small-caps">$1</span>')
-    .replace(/\\textrm\{([\s\S]*?)\}/g, '$1')
-    .replace(/\\textsf\{([\s\S]*?)\}/g, '$1')
-    // colors
-    .replace(/\\textcolor\{[^}]*\}\{([^}]*)\}/g, '$1')
-    // footnote
-    .replace(/\\footnote\{([\s\S]*?)\}/g, '<sup title="$1">†</sup>')
-    // href
-    .replace(/\\href\{([^}]*)\}\{([^}]*)\}/g, '<a href="$1" style="color:#1a5cb0">$2</a>')
-    .replace(/\\url\{([^}]*)\}/g, '<a href="$1" style="color:#1a5cb0">$1</a>')
-    // cite, ref
-    .replace(/\\cite\{([^}]*)\}/g, '[<em>$1</em>]')
-    .replace(/\\ref\{([^}]*)\}/g, '<em>ref:$1</em>')
-    .replace(/\\label\{[^}]*\}/g, '')
-    // special chars
-    .replace(/\\&/g, '&amp;')
-    .replace(/\\%/g, '%')
-    .replace(/\\#/g, '#')
-    .replace(/\\_/g, '_')
-    .replace(/\\\$/g, '$')
-    .replace(/\\textbackslash/g, '\\')
-    .replace(/``/g, '\u201C').replace(/''/g, '\u201D')
-    .replace(/`/g, '\u2018').replace(/'/g, '\u2019')
-    .replace(/---/g, '\u2014').replace(/--/g, '\u2013')
-    // strip remaining commands
-    .replace(/\\[a-zA-Z]+\*?\{([^}]*)\}/g, '$1')
-    .replace(/\\[a-zA-Z]+\*/g, '').replace(/\\[a-zA-Z]+/g, '')
-    .replace(/\{|\}/g, '')
-    // newlines inside paragraph
-    .replace(/\n/g, ' ')
-    .trim();
+    .replace(/\\textbf\{((?:[^{}]|\{[^{}]*\})*)\}/g,'<strong>$1</strong>')
+    .replace(/\\textit\{((?:[^{}]|\{[^{}]*\})*)\}/g,'<em>$1</em>')
+    .replace(/\\emph\{((?:[^{}]|\{[^{}]*\})*)\}/g,'<em>$1</em>')
+    .replace(/\\underline\{((?:[^{}]|\{[^{}]*\})*)\}/g,'<u>$1</u>')
+    .replace(/\\texttt\{((?:[^{}]|\{[^{}]*\})*)\}/g,'<span class="ci">$1</span>')
+    .replace(/\\textsc\{((?:[^{}]|\{[^{}]*\})*)\}/g,'<span style="font-variant:small-caps">$1</span>')
+    .replace(/\\textrm\{((?:[^{}]|\{[^{}]*\})*)\}/g,'$1')
+    .replace(/\\textsf\{((?:[^{}]|\{[^{}]*\})*)\}/g,'$1')
+    .replace(/\\textcolor\{[^}]*\}\{((?:[^{}]|\{[^{}]*\})*)\}/g,'$1')
+    .replace(/\\href\{([^}]*)\}\{((?:[^{}]|\{[^{}]*\})*)\}/g,'<a href="$1">$2</a>')
+    .replace(/\\url\{([^}]*)\}/g,'<a href="$1">$1</a>')
+    .replace(/\\(?:cite|citep|citet)\{([^}]*)\}/g,(_,k)=>'['+k.split(',').map(x=>x.trim()).join(', ')+']')
+    .replace(/\\(?:eqref|ref|autoref)\{([^}]*)\}/g,'($1)')
+    .replace(/\\label\{[^}]*\}/g,'')
+    .replace(/\\&/g,'&amp;').replace(/\\%/g,'%').replace(/\\#/g,'#')
+    .replace(/\\\$/g,'$').replace(/\\_/g,'_').replace(/\\{/g,'{').replace(/\\}/g,'}')
+    .replace(/\\textbackslash\b/g,'\\')
+    .replace(/\\LaTeX\b/g,'L<sup>A</sup>T<sub>E</sub>X')
+    .replace(/\\TeX\b/g,'T<sub>E</sub>X')
+    .replace(/\\today\b/g, new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}))
+    .replace(/``/g,'\u201C').replace(/''/g,'\u201D')
+    .replace(/`/g,'\u2018')
+    .replace(/---/g,'\u2014').replace(/--/g,'\u2013')
+    .replace(/~/g,'&nbsp;')
+    .replace(/\\[a-zA-Z]+\*?\{((?:[^{}]|\{[^{}]*\})*)\}/g,'$1')
+    .replace(/\\[a-zA-Z]+\*/g,'').replace(/\\[a-zA-Z]+\b/g,'')
+    .replace(/(?<!\w)\{|\}(?!\w)/g,'')
+    .replace(/\n/g,' ').trim();
+  // restore math
+  ms.forEach((m,i) => s = s.replace('%%MS'+i+'%%', m));
+  md.forEach((m,i) => s = s.replace('%%MD'+i+'%%', m));
   return s;
 }
 
-// ══════════════════════════════════════════════════════════
-//  PDF DOWNLOAD
-// ══════════════════════════════════════════════════════════
-function downloadPDF() {
-  toast('Preparing PDF for download…');
-  // Trigger browser print dialog which saves as PDF
-  const printWindow = window.open('', '_blank');
-  const title = document.getElementById('doc-title-input').value || 'document';
-  const previewHtml = document.getElementById('preview-page').innerHTML;
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
 
-  printWindow.document.write(`<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>${title}</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js"><\/script>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display&display=swap');
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body {
-    font-family: Georgia, 'Times New Roman', serif;
-    font-size: 11pt;
-    line-height: 1.8;
-    color: #111;
-    padding: 60px 80px;
-    max-width: 720px;
-    margin: auto;
+// ═══════════════════════
+//  PDF — uses html2pdf.js
+// ═══════════════════════
+async function downloadPDF() {
+  doSave();
+  const paperEl = document.getElementById('paper');
+  if (paperEl.querySelector('.empty')) {
+    compile();
+    await new Promise(r => setTimeout(r, 1400));
   }
-  .doc-title { font-size:18pt;font-weight:bold;text-align:center;margin-bottom:6px;line-height:1.3; }
-  .doc-author { font-size:11pt;text-align:center;margin-bottom:4px; }
-  .doc-date { font-size:10pt;text-align:center;color:#555;margin-bottom:20px; }
-  .doc-abstract { margin:0 30px 20px;border:1px solid #ccc;padding:12px 16px;font-size:10pt; }
-  .doc-abstract-title { font-weight:bold;text-align:center;margin-bottom:6px; }
-  h1 { font-size:14pt;margin:20px 0 8px;font-weight:bold; }
-  h2 { font-size:12pt;margin:16px 0 6px;font-weight:bold; }
-  h3 { font-size:11pt;margin:12px 0 4px;font-weight:bold;font-style:italic; }
-  p { margin-bottom:10px;text-align:justify; }
-  .math-block { text-align:center;margin:14px 0;overflow-x:auto; }
-  ul,ol { margin:8px 0 8px 28px; }
-  li { margin-bottom:4px; }
-  table { border-collapse:collapse;margin:14px auto;font-size:10pt; }
-  td,th { border:1px solid #999;padding:5px 12px; }
-  th { font-weight:bold;background:#f5f5f5; }
-  .figure { text-align:center;margin:16px 0; }
-  .caption { font-size:9.5pt;color:#444;margin-top:4px; }
-  .hrule { border:none;border-top:1px solid #ccc;margin:16px 0; }
-  .verbatim { background:#f5f5f5;border:1px solid #ddd;padding:10px 14px;font-family:monospace;font-size:9.5pt;margin:10px 0;white-space:pre-wrap; }
-  .ref-item { font-size:9.5pt;margin-bottom:6px; }
-  .code-inline { font-family:monospace;background:#f0f0f0;padding:1px 5px;border-radius:3px;font-size:9.5pt; }
-  @media print { body { padding: 0; } }
-</style>
-</head>
-<body>${previewHtml}
-<script>
-window.MathJax = { startup: { ready() { MathJax.startup.defaultReady(); setTimeout(()=>window.print(), 1200); } } };
-<\/script>
-</body></html>`);
-  printWindow.document.close();
-  toast('Print dialog opened — save as PDF!');
+
+  toast('Generating PDF\u2026');
+  const title = (document.getElementById('doc-title').value || 'document')
+    .replace(/[^a-zA-Z0-9\s-]/g,'').replace(/\s+/g,'-').trim() || 'latexify-document';
+
+  // Build a self-contained print clone
+  const clone = paperEl.cloneNode(true);
+
+  // Inline the paper styles so html2pdf renders correctly
+  clone.setAttribute('style',
+    'font-family:Georgia,"Times New Roman",serif;font-size:11.5pt;line-height:1.75;' +
+    'color:#1a1a1a;background:#fff;padding:0;margin:0;max-width:none;width:100%;' +
+    'box-shadow:none;border:none;');
+
+  // Fix any MathJax CHTML inline styles (copy computed)
+  const mj = clone.querySelectorAll('mjx-container');
+  mj.forEach(el => { el.style.display = el.style.display || 'inline'; });
+
+  // Wrapper needed by html2pdf
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'width:694px;background:#fff;';
+  wrap.appendChild(clone);
+
+  const opt = {
+    margin:      [12, 14, 12, 14],
+    filename:    title + '.pdf',
+    image:       {type:'jpeg', quality:0.97},
+    html2canvas: {scale:2, useCORS:true, backgroundColor:'#ffffff', logging:false, allowTaint:true},
+    jsPDF:       {unit:'mm', format:'a4', orientation:'portrait'},
+    pagebreak:   {mode:['css','legacy']},
+  };
+
+  try {
+    await html2pdf().set(opt).from(wrap).save();
+    toast('PDF downloaded! \u2713');
+  } catch(err) {
+    toast('PDF failed: ' + err.message);
+    console.error(err);
+  }
 }
 
-// ══════════════════════════════════════════════════════════
+// ═══════════════════════
+//  TEMPLATES
+// ═══════════════════════
+function gtpl(id) {
+  const el = document.getElementById('tpl-' + id);
+  return el ? el.textContent.trim() : '';
+}
+
+function bibDefault() {
+  return '@article{ref1,\n  author  = {Doe, John and Smith, Anna},\n  title   = {A Novel Method},\n  journal = {J. Machine Learning Research},\n  year    = {2024},\n  volume  = {25},\n  pages   = {1--20},\n}\n\n@inproceedings{ref2,\n  author    = {Smith, Anna},\n  title     = {Earlier Approaches},\n  booktitle = {Proc. ICML},\n  year      = {2023},\n  pages     = {100--110},\n}';
+}
+
+function loadTpl(id) {
+  const c = gtpl(id);
+  if (!c) { toast('Template not found'); return; }
+  if (!S.files['main.tex']) mkFile('main.tex', c);
+  else S.files['main.tex'].content = c;
+  closeM('mtpl');
+  openF('main.tex');
+  setTimeout(compile, 400);
+  toast('Template loaded \u2713');
+}
+
+// ═══════════════════════
+//  STATUS
+// ═══════════════════════
+function updateSt() {
+  const v = cm.getValue(), cur = cm.getCursor();
+  document.getElementById('sln').textContent  = cur.line+1;
+  document.getElementById('scol').textContent = cur.ch+1;
+  document.getElementById('swds').textContent = v.trim() ? v.trim().split(/\s+/).length : 0;
+  document.getElementById('schs').textContent = v.length;
+}
+
+// ═══════════════════════
+//  LAYOUT
+// ═══════════════════════
+function setV(mode) {
+  S.view = mode;
+  const ed = document.getElementById('edwrap');
+  const pv = document.getElementById('pvwrap');
+  const rz = document.getElementById('rzr');
+  ['vs','ve','vp'].forEach(id => document.getElementById(id).classList.remove('on'));
+  document.getElementById({split:'vs',ed:'ve',pv:'vp'}[mode]).classList.add('on');
+  if (mode==='split') {
+    ed.style.display=''; pv.style.display=''; rz.style.display=''; pv.style.width='48%';
+  } else if (mode==='ed') {
+    ed.style.display=''; pv.style.display='none'; rz.style.display='none';
+  } else {
+    ed.style.display='none'; pv.style.display=''; rz.style.display='none'; pv.style.width='100%';
+  }
+  setTimeout(()=>cm.refresh(),60);
+}
+
+function toggleSB() {
+  S.sbOpen = !S.sbOpen;
+  document.getElementById('sb').classList.toggle('closed', !S.sbOpen);
+  setTimeout(()=>cm.refresh(),220);
+}
+
+// ═══════════════════════
+//  RESIZER
+// ═══════════════════════
+function setupRzr() {
+  const rz = document.getElementById('rzr');
+  const pv = document.getElementById('pvwrap');
+  const app = document.getElementById('app');
+  let drag=false, sx=0, sw=0;
+  rz.addEventListener('mousedown', e=>{
+    drag=true; sx=e.clientX; sw=pv.offsetWidth;
+    rz.classList.add('on');
+    document.body.style.userSelect='none'; document.body.style.cursor='col-resize';
+  });
+  document.addEventListener('mousemove', e=>{
+    if (!drag) return;
+    const nw = Math.max(160, Math.min(app.offsetWidth-160, sw+(sx-e.clientX)));
+    pv.style.width = nw+'px';
+  });
+  document.addEventListener('mouseup', ()=>{
+    if (!drag) return;
+    drag=false; rz.classList.remove('on');
+    document.body.style.userSelect=''; document.body.style.cursor='';
+    cm.refresh();
+  });
+}
+
+// ═══════════════════════
 //  MODALS
-// ══════════════════════════════════════════════════════════
-function toggleShortcuts() {
-  const m = document.getElementById('shortcuts-modal');
-  m.classList.toggle('open');
-}
+// ═══════════════════════
+function openM(id)  { document.getElementById(id).classList.add('open'); }
+function closeM(id) { document.getElementById(id).classList.remove('open'); }
 
-// ══════════════════════════════════════════════════════════
-//  TOAST
-// ══════════════════════════════════════════════════════════
-function toast(msg, dur=2800) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  clearTimeout(el._t);
-  el._t = setTimeout(() => el.classList.remove('show'), dur);
-}
-
-// ══════════════════════════════════════════════════════════
-//  GLOBAL KEYBOARD
-// ══════════════════════════════════════════════════════════
 document.addEventListener('keydown', e => {
-  if (e.ctrlKey && e.shiftKey && e.key === 'D') { e.preventDefault(); downloadPDF(); }
+  if (e.key==='Escape') {
+    document.querySelectorAll('.mb.open').forEach(m=>m.classList.remove('open'));
+    toggleSym(false);
+  }
+  if (e.ctrlKey && e.shiftKey && e.key==='D') { e.preventDefault(); downloadPDF(); }
+  if (e.ctrlKey && e.shiftKey && e.key==='N') { e.preventDefault(); newFile(); }
+  if (e.ctrlKey && e.key==='\\') { e.preventDefault(); toggleSB(); }
 });
 
-// ══════════════════════════════════════════════════════════
-//  BOOT
-// ══════════════════════════════════════════════════════════
-init();
+// ═══════════════════════
+//  TOAST
+// ═══════════════════════
+let _tt;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className='show';
+  clearTimeout(_tt); _tt = setTimeout(()=>{ el.className=''; }, 3200);
+}
 </script>
 </body>
 </html>
