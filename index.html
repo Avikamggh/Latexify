@@ -1,0 +1,1717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Latexify — Free LaTeX Editor for Researchers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,600;0,700;1,500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #13161e;
+    --surface2: #1a1e28;
+    --surface3: #222636;
+    --border: #2a2f42;
+    --border2: #333855;
+    --accent: #6c8ef5;
+    --accent2: #a78bfa;
+    --accent3: #34d399;
+    --text: #e8eaf0;
+    --text2: #9ba3bf;
+    --text3: #5a6480;
+    --red: #f87171;
+    --yellow: #fbbf24;
+    --font-mono: 'JetBrains Mono', monospace;
+    --font-display: 'Playfair Display', serif;
+    --font-body: 'DM Sans', sans-serif;
+    --sidebar-w: 260px;
+    --toolbar-h: 48px;
+    --header-h: 56px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 14px;
+    overflow: hidden;
+  }
+
+  /* ── HEADER ── */
+  #header {
+    height: var(--header-h);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 16px;
+    position: relative;
+    z-index: 100;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+  }
+  .logo-icon {
+    width: 30px; height: 30px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 13px;
+    color: #fff;
+    letter-spacing: -1px;
+  }
+  .logo-text {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.5px;
+  }
+  .logo-text span { color: var(--accent); }
+
+  .badge-free {
+    font-size: 10px;
+    font-weight: 600;
+    background: linear-gradient(90deg, var(--accent3), #10b981);
+    color: #000;
+    padding: 2px 7px;
+    border-radius: 99px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .header-center {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  #doc-title-input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 6px;
+    width: 280px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  #doc-title-input:focus { border-color: var(--accent); }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 6px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text2);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { background: var(--surface2); color: var(--text); border-color: var(--border2); }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+  }
+  .btn-primary:hover { opacity: 0.85; transform: translateY(-1px); }
+
+  .btn-success {
+    background: var(--accent3);
+    color: #000;
+    font-weight: 600;
+  }
+  .btn-success:hover { opacity: 0.85; transform: translateY(-1px); }
+
+  .btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+  /* ── TOOLBAR ── */
+  #toolbar {
+    height: var(--toolbar-h);
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 2px;
+    overflow-x: auto;
+    position: relative;
+    z-index: 99;
+  }
+  #toolbar::-webkit-scrollbar { height: 3px; }
+  #toolbar::-webkit-scrollbar-track { background: transparent; }
+  #toolbar::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
+
+  .tb-group {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+  }
+  .tb-sep {
+    width: 1px;
+    height: 24px;
+    background: var(--border);
+    margin: 0 6px;
+  }
+  .tb-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 9px;
+    border: none;
+    background: transparent;
+    color: var(--text2);
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.12s;
+    white-space: nowrap;
+  }
+  .tb-btn:hover { background: var(--surface3); color: var(--text); }
+  .tb-btn.active { background: var(--accent); color: #fff; }
+  .tb-btn svg { width: 13px; height: 13px; }
+
+  /* ── MAIN LAYOUT ── */
+  #main {
+    display: flex;
+    height: calc(100vh - var(--header-h) - var(--toolbar-h));
+    overflow: hidden;
+  }
+
+  /* ── FILE SIDEBAR ── */
+  #file-sidebar {
+    width: var(--sidebar-w);
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    transition: width 0.2s;
+  }
+  #file-sidebar.collapsed { width: 0; overflow: hidden; }
+
+  .sidebar-header {
+    padding: 12px 14px 10px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .sidebar-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text3);
+  }
+
+  .file-tree {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+  }
+  .file-tree::-webkit-scrollbar { width: 4px; }
+  .file-tree::-webkit-scrollbar-track { background: transparent; }
+  .file-tree::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+  .file-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    cursor: pointer;
+    color: var(--text2);
+    font-size: 13px;
+    transition: all 0.1s;
+    border-left: 2px solid transparent;
+  }
+  .file-item:hover { background: var(--surface2); color: var(--text); }
+  .file-item.active {
+    background: rgba(108,142,245,0.12);
+    color: var(--accent);
+    border-left-color: var(--accent);
+  }
+  .file-item svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+  /* ── EDITOR PANE ── */
+  #editor-pane {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background: var(--bg);
+    position: relative;
+  }
+
+  .editor-tabs {
+    display: flex;
+    align-items: center;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 8px;
+    height: 36px;
+    gap: 2px;
+  }
+  .editor-tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 12px;
+    height: 100%;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text3);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.12s;
+    white-space: nowrap;
+  }
+  .editor-tab:hover { color: var(--text2); }
+  .editor-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .editor-wrapper {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .line-numbers {
+    padding: 16px 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    min-width: 48px;
+    text-align: right;
+    color: var(--text3);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.65;
+    overflow: hidden;
+    user-select: none;
+    padding-right: 12px;
+    padding-left: 8px;
+  }
+
+  #latex-editor {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 13.5px;
+    line-height: 1.65;
+    padding: 16px;
+    resize: none;
+    overflow-y: auto;
+    tab-size: 2;
+    white-space: pre;
+    overflow-wrap: normal;
+    overflow-x: auto;
+    caret-color: var(--accent);
+  }
+  #latex-editor::-webkit-scrollbar { width: 6px; height: 6px; }
+  #latex-editor::-webkit-scrollbar-track { background: transparent; }
+  #latex-editor::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
+  #latex-editor::selection { background: rgba(108,142,245,0.3); }
+
+  /* ── PREVIEW PANE ── */
+  #preview-pane {
+    width: 50%;
+    background: #fff;
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .preview-header {
+    height: 36px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 8px;
+  }
+  .preview-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    flex: 1;
+  }
+
+  .preview-actions { display: flex; gap: 6px; align-items: center; }
+
+  #preview-scroll {
+    flex: 1;
+    overflow-y: auto;
+    background: #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    gap: 20px;
+  }
+  #preview-scroll::-webkit-scrollbar { width: 6px; }
+  #preview-scroll::-webkit-scrollbar-track { background: #e0e0e0; }
+  #preview-scroll::-webkit-scrollbar-thumb { background: #bbb; border-radius: 99px; }
+
+  #preview-page {
+    width: 100%;
+    max-width: 680px;
+    background: #fff;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+    border-radius: 2px;
+    padding: 72px 80px;
+    min-height: 880px;
+    font-family: 'Computer Modern', 'Latin Modern', Georgia, serif;
+    font-size: 11pt;
+    line-height: 1.8;
+    color: #111;
+  }
+
+  #preview-page .doc-title {
+    font-size: 18pt;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+  #preview-page .doc-author {
+    font-size: 11pt;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+  #preview-page .doc-date {
+    font-size: 10pt;
+    text-align: center;
+    color: #555;
+    margin-bottom: 20px;
+  }
+  #preview-page .doc-abstract {
+    margin: 0 30px 20px;
+    border: 1px solid #ccc;
+    padding: 12px 16px;
+    font-size: 10pt;
+  }
+  #preview-page .doc-abstract-title {
+    font-weight: bold;
+    text-align: center;
+    font-size: 10pt;
+    margin-bottom: 6px;
+  }
+  #preview-page h1 { font-size: 14pt; margin: 20px 0 8px; font-weight: bold; }
+  #preview-page h2 { font-size: 12pt; margin: 16px 0 6px; font-weight: bold; }
+  #preview-page h3 { font-size: 11pt; margin: 12px 0 4px; font-weight: bold; font-style: italic; }
+  #preview-page p { margin-bottom: 10px; text-align: justify; }
+  #preview-page .math-block { text-align: center; margin: 14px 0; overflow-x: auto; }
+  #preview-page .math-inline { display: inline; }
+  #preview-page ul, #preview-page ol { margin: 8px 0 8px 28px; }
+  #preview-page li { margin-bottom: 4px; }
+  #preview-page .ref-list { margin-top: 20px; }
+  #preview-page .ref-item { font-size: 9.5pt; margin-bottom: 6px; }
+  #preview-page table { border-collapse: collapse; margin: 14px auto; font-size: 10pt; }
+  #preview-page td, #preview-page th { border: 1px solid #999; padding: 5px 12px; }
+  #preview-page th { font-weight: bold; background: #f5f5f5; }
+  #preview-page .figure { text-align: center; margin: 16px 0; }
+  #preview-page .caption { font-size: 9.5pt; color: #444; margin-top: 4px; }
+  #preview-page .hrule { border: none; border-top: 1px solid #ccc; margin: 16px 0; }
+  #preview-page .verbatim { background: #f5f5f5; border: 1px solid #ddd; padding: 10px 14px; font-family: monospace; font-size: 9.5pt; margin: 10px 0; white-space: pre-wrap; }
+  #preview-page .bold { font-weight: bold; }
+  #preview-page .italic { font-style: italic; }
+  #preview-page .underline { text-decoration: underline; }
+  #preview-page .code-inline { font-family: monospace; background: #f0f0f0; padding: 1px 5px; border-radius: 3px; font-size: 9.5pt; }
+  #preview-page .footnote { font-size: 9pt; color: #555; border-top: 1px solid #ccc; margin-top: 30px; padding-top: 6px; }
+
+  /* ── STATUS BAR ── */
+  #statusbar {
+    height: 26px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    gap: 20px;
+    font-size: 11px;
+    color: var(--text3);
+    position: relative;
+    z-index: 99;
+  }
+  .status-item { display: flex; align-items: center; gap: 4px; }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent3); }
+  .status-dot.compiling { background: var(--yellow); animation: pulse 1s infinite; }
+  .status-dot.error { background: var(--red); }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* ── FOOTER ── */
+  #footer {
+    background: linear-gradient(135deg, #0a0c12, #111525);
+    border-top: 1px solid var(--border);
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    position: relative;
+    z-index: 100;
+    flex-shrink: 0;
+  }
+
+  .footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .footer-heart {
+    font-size: 13px;
+    color: var(--text3);
+    line-height: 1.5;
+  }
+  .footer-heart strong {
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .footer-heart em { color: var(--accent3); font-style: normal; }
+
+  .footer-links {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+  .footer-link {
+    color: var(--text3);
+    text-decoration: none;
+    font-size: 12px;
+    transition: color 0.15s;
+  }
+  .footer-link:hover { color: var(--accent); }
+
+  /* ── MODALS ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(6px);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 28px 32px;
+    max-width: 520px;
+    width: 90vw;
+    animation: modal-in 0.2s ease;
+  }
+  @keyframes modal-in { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+  .modal-title { font-family: var(--font-display); font-size: 20px; margin-bottom: 16px; color: var(--text); }
+  .modal-close {
+    position: absolute;
+    top: 18px; right: 18px;
+    background: none; border: none;
+    color: var(--text3); cursor: pointer; font-size: 20px;
+  }
+  .modal-close:hover { color: var(--text); }
+  .modal-body { color: var(--text2); font-size: 14px; line-height: 1.7; margin-bottom: 20px; }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed;
+    bottom: 60px;
+    right: 20px;
+    background: var(--surface3);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all 0.2s;
+    z-index: 9999;
+    pointer-events: none;
+    max-width: 320px;
+  }
+  #toast.show { opacity: 1; transform: translateY(0); }
+
+  /* ── SYMBOL PICKER ── */
+  #symbol-panel {
+    position: absolute;
+    top: 48px;
+    left: 0;
+    right: 0;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 14px;
+    display: none;
+    flex-wrap: wrap;
+    gap: 4px;
+    z-index: 50;
+    max-height: 120px;
+    overflow-y: auto;
+  }
+  #symbol-panel.open { display: flex; }
+  .sym-btn {
+    padding: 4px 8px;
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.1s;
+  }
+  .sym-btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* ── DRAG RESIZER ── */
+  #resizer {
+    width: 4px;
+    background: var(--border);
+    cursor: col-resize;
+    flex-shrink: 0;
+    transition: background 0.15s;
+    position: relative;
+    z-index: 10;
+  }
+  #resizer:hover, #resizer.dragging { background: var(--accent); }
+
+  /* ── COMPILE SPINNER ── */
+  .spinner {
+    width: 12px; height: 12px;
+    border: 2px solid var(--border2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    display: none;
+  }
+  .spinner.active { display: inline-block; }
+  @keyframes spin { to{transform:rotate(360deg)} }
+
+  /* ── KEYBOARD SHORTCUTS PANEL ── */
+  .shortcuts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .shortcut-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .shortcut-item kbd {
+    background: var(--surface3);
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+  }
+
+  /* scrollbar global */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+  /* print styles for PDF */
+  @media print {
+    #header, #toolbar, #file-sidebar, #editor-pane, #statusbar, #footer { display: none !important; }
+    #preview-pane { width: 100%; border: none; }
+    #preview-page { box-shadow: none; padding: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="header">
+  <a class="logo" href="#">
+    <div class="logo-icon">Lx</div>
+    <div class="logo-text">Latex<span>ify</span></div>
+  </a>
+  <span class="badge-free">Free Forever</span>
+
+  <div class="header-center">
+    <input id="doc-title-input" type="text" value="Untitled Research Paper" placeholder="Document title…">
+  </div>
+
+  <div class="header-actions">
+    <button class="btn btn-ghost" onclick="toggleShortcuts()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8"/></svg>
+      Shortcuts
+    </button>
+    <button class="btn btn-ghost" onclick="insertTemplate('ieee')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Templates
+    </button>
+    <button class="btn btn-primary" onclick="compileLatex()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      Compile
+    </button>
+    <button class="btn btn-success" onclick="downloadPDF()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download PDF
+    </button>
+  </div>
+</div>
+
+<!-- TOOLBAR -->
+<div id="toolbar">
+  <!-- Text formatting -->
+  <div class="tb-group">
+    <button class="tb-btn" onclick="insertSnippet('\\\\textbf{', '}')" title="Bold">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/></svg>
+      Bold
+    </button>
+    <button class="tb-btn" onclick="insertSnippet('\\\\textit{', '}')" title="Italic">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="15" y1="4" x2="9" y2="20"/></svg>
+      Italic
+    </button>
+    <button class="tb-btn" onclick="insertSnippet('\\\\underline{', '}')" title="Underline">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3"/><line x1="4" y1="21" x2="20" y2="21"/></svg>
+      Underline
+    </button>
+    <button class="tb-btn" onclick="insertSnippet('\\\\texttt{', '}')" title="Monospace">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      Code
+    </button>
+  </div>
+  <div class="tb-sep"></div>
+
+  <!-- Math -->
+  <div class="tb-group">
+    <button class="tb-btn" onclick="insertSnippet('$', '$')" title="Inline Math">∫ Inline</button>
+    <button class="tb-btn" onclick="insertBlock('\\\\[\n', '\n\\\\]')" title="Display Math">∑ Display</button>
+    <button class="tb-btn" onclick="insertBlock('\\\\begin{equation}\n', '\n\\\\end{equation}')" title="Equation">Eq.</button>
+    <button class="tb-btn" onclick="insertBlock('\\\\begin{align}\n  & \\\\\\\\\n', '\n\\\\end{align}')" title="Align">Align</button>
+    <button class="tb-btn" id="sym-toggle-btn" onclick="toggleSymbols()" title="Symbols">Σ Symbols</button>
+  </div>
+  <div class="tb-sep"></div>
+
+  <!-- Sections -->
+  <div class="tb-group">
+    <button class="tb-btn" onclick="insertLine('\\\\section{Section Title}')" title="Section">§ Section</button>
+    <button class="tb-btn" onclick="insertLine('\\\\subsection{Subsection}')" title="Subsection">§§ Subsec</button>
+    <button class="tb-btn" onclick="insertLine('\\\\subsubsection{}')" title="Subsubsection">§§§</button>
+  </div>
+  <div class="tb-sep"></div>
+
+  <!-- Environments -->
+  <div class="tb-group">
+    <button class="tb-btn" onclick="insertBlock('\\\\begin{itemize}\n  \\\\item ', '\n\\\\end{itemize}')" title="Bullet list">• List</button>
+    <button class="tb-btn" onclick="insertBlock('\\\\begin{enumerate}\n  \\\\item ', '\n\\\\end{enumerate}')" title="Numbered list">1. Enum</button>
+    <button class="tb-btn" onclick="insertBlock('\\\\begin{figure}[h]\n\\\\centering\n% \\\\includegraphics[width=0.8\\\\textwidth]{}\n\\\\caption{Caption}\n\\\\label{fig:label}\n', '\\\\end{figure}')" title="Figure">Fig</button>
+    <button class="tb-btn" onclick="insertBlock('\\\\begin{table}[h]\n\\\\centering\n\\\\begin{tabular}{|c|c|c|}\n\\\\hline\nCol 1 & Col 2 & Col 3 \\\\\\\\\n\\\\hline\na & b & c \\\\\\\\\n\\\\hline\n\\\\end{tabular}\n\\\\caption{Table caption}\n\\\\label{tab:label}\n', '\\\\end{table}')" title="Table">⊞ Table</button>
+    <button class="tb-btn" onclick="insertBlock('\\\\begin{verbatim}\n', '\n\\\\end{verbatim}')" title="Verbatim">{ } Verb</button>
+  </div>
+  <div class="tb-sep"></div>
+
+  <!-- Cross-refs -->
+  <div class="tb-group">
+    <button class="tb-btn" onclick="insertSnippet('\\\\ref{', '}')" title="Reference">\\ref</button>
+    <button class="tb-btn" onclick="insertSnippet('\\\\cite{', '}')" title="Citation">\\cite</button>
+    <button class="tb-btn" onclick="insertSnippet('\\\\label{', '}')" title="Label">\\label</button>
+    <button class="tb-btn" onclick="insertLine('\\\\footnote{}')" title="Footnote">†Foot</button>
+  </div>
+  <div class="tb-sep"></div>
+
+  <!-- View -->
+  <div class="tb-group">
+    <button class="tb-btn" id="btn-split" onclick="setLayout('split')" title="Split view">⬜ Split</button>
+    <button class="tb-btn" id="btn-editor" onclick="setLayout('editor')" title="Editor only">✎ Editor</button>
+    <button class="tb-btn" id="btn-preview" onclick="setLayout('preview')" title="Preview only">👁 Preview</button>
+  </div>
+</div>
+
+<!-- SYMBOL PANEL -->
+<div id="symbol-panel">
+</div>
+
+<!-- MAIN LAYOUT -->
+<div id="main">
+
+  <!-- FILE SIDEBAR -->
+  <div id="file-sidebar">
+    <div class="sidebar-header">
+      <span class="sidebar-title">Files</span>
+      <button class="tb-btn" onclick="addFile()" title="New file" style="padding:3px 7px">+</button>
+    </div>
+    <div class="file-tree" id="file-tree"></div>
+  </div>
+
+  <!-- EDITOR PANE -->
+  <div id="editor-pane">
+    <div class="editor-tabs" id="editor-tabs"></div>
+    <div class="editor-wrapper">
+      <div class="line-numbers" id="line-numbers">1</div>
+      <textarea id="latex-editor" spellcheck="false" autocorrect="off" autocapitalize="off"></textarea>
+    </div>
+  </div>
+
+  <!-- RESIZER -->
+  <div id="resizer"></div>
+
+  <!-- PREVIEW PANE -->
+  <div id="preview-pane">
+    <div class="preview-header">
+      <span class="preview-title">Preview</span>
+      <div class="preview-actions">
+        <div class="spinner" id="compile-spinner"></div>
+        <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px" onclick="compileLatex()">↺ Refresh</button>
+        <button class="btn btn-success" style="padding:4px 10px;font-size:11px" onclick="downloadPDF()">⬇ PDF</button>
+      </div>
+    </div>
+    <div id="preview-scroll">
+      <div id="preview-page">
+        <div style="text-align:center; color:#999; margin-top:80px; font-style:italic">
+          Click <strong>Compile</strong> or press <strong>Ctrl+Enter</strong> to preview your document
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- STATUS BAR -->
+<div id="statusbar">
+  <div class="status-item">
+    <div class="status-dot" id="status-dot"></div>
+    <span id="status-text">Ready</span>
+  </div>
+  <div class="status-item">Line: <span id="cursor-line">1</span>, Col: <span id="cursor-col">1</span></div>
+  <div class="status-item">Words: <span id="word-count">0</span></div>
+  <div class="status-item">Chars: <span id="char-count">0</span></div>
+  <div class="status-item" id="last-compiled"></div>
+  <div style="flex:1"></div>
+  <div class="status-item" style="color:var(--accent3)">Auto-save: ON</div>
+  <div class="status-item">LaTeX 2e</div>
+</div>
+
+<!-- FOOTER -->
+<div id="footer">
+  <div class="footer-brand">
+    <div class="logo-icon" style="width:24px;height:24px;font-size:11px">Lx</div>
+    <div class="footer-heart">
+      Crafted with <em>♥</em> by <strong>Avikam</strong> &nbsp;·&nbsp;
+      Free forever for every researcher chasing something <em>astonishing</em> &nbsp;·&nbsp;
+      <em>Science belongs to everyone.</em>
+    </div>
+  </div>
+  <div class="footer-links">
+    <a href="#" class="footer-link">About</a>
+    <a href="#" class="footer-link">GitHub</a>
+    <a href="#" class="footer-link">Feedback</a>
+    <a href="#" class="footer-link">Privacy</a>
+  </div>
+</div>
+
+<!-- SHORTCUTS MODAL -->
+<div class="modal-overlay" id="shortcuts-modal" onclick="if(event.target===this)toggleShortcuts()">
+  <div class="modal" style="max-width:640px;position:relative">
+    <button class="modal-close" onclick="toggleShortcuts()">×</button>
+    <div class="modal-title">Keyboard Shortcuts</div>
+    <div class="shortcuts-grid">
+      <div class="shortcut-item"><span>Compile / Preview</span><kbd>Ctrl+Enter</kbd></div>
+      <div class="shortcut-item"><span>Download PDF</span><kbd>Ctrl+Shift+D</kbd></div>
+      <div class="shortcut-item"><span>Bold</span><kbd>Ctrl+B</kbd></div>
+      <div class="shortcut-item"><span>Italic</span><kbd>Ctrl+I</kbd></div>
+      <div class="shortcut-item"><span>Inline Math</span><kbd>Ctrl+M</kbd></div>
+      <div class="shortcut-item"><span>Save</span><kbd>Ctrl+S</kbd></div>
+      <div class="shortcut-item"><span>Undo</span><kbd>Ctrl+Z</kbd></div>
+      <div class="shortcut-item"><span>Redo</span><kbd>Ctrl+Y</kbd></div>
+      <div class="shortcut-item"><span>Comment Line</span><kbd>Ctrl+/</kbd></div>
+      <div class="shortcut-item"><span>Find</span><kbd>Ctrl+F</kbd></div>
+      <div class="shortcut-item"><span>Tab Indent</span><kbd>Tab</kbd></div>
+      <div class="shortcut-item"><span>Toggle Symbols</span><kbd>Ctrl+Shift+S</kbd></div>
+    </div>
+    <div class="modal-actions" style="margin-top:20px">
+      <button class="btn btn-primary" onclick="toggleShortcuts()">Got it</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════════
+const state = {
+  files: {},
+  activeFile: 'main.tex',
+  layout: 'split',
+  autoCompileTimer: null,
+};
+
+const DEFAULT_TEX = `\\documentclass[12pt,a4paper]{article}
+\\usepackage[utf8]{inputenc}
+\\usepackage{amsmath, amssymb, amsthm}
+\\usepackage{graphicx}
+\\usepackage{hyperref}
+\\usepackage{geometry}
+\\geometry{margin=1in}
+
+% ---- Document Metadata ----
+\\title{My Research Paper: A Comprehensive Study\\\\
+\\large Subtitle Goes Here}
+\\author{Author Name\\\\
+\\textit{Department of Science, University of Research}\\\\
+\\texttt{author@university.edu}}
+\\date{\\today}
+
+\\begin{document}
+
+\\maketitle
+
+\\begin{abstract}
+This paper presents a comprehensive study of an important research topic.
+We demonstrate novel findings through rigorous experimentation and analysis.
+Our results show significant improvements over baseline methods, with implications
+for future research in this domain. All code and data are publicly available.
+\\end{abstract}
+
+\\section{Introduction}
+Research is the systematic investigation of materials and sources to establish
+facts and reach new conclusions. In this paper, we explore the fundamental
+aspects of our proposed method \\cite{reference2024}.
+
+The main contributions of this work are:
+\\begin{enumerate}
+  \\item A novel theoretical framework for the problem
+  \\item An efficient algorithm with $\\mathcal{O}(n \\log n)$ complexity
+  \\item Extensive empirical evaluation on benchmark datasets
+\\end{enumerate}
+
+\\section{Related Work}
+Previous work by Smith et al. \\cite{smith2023} proposed an early approach.
+Our method builds upon these foundations but introduces key improvements.
+
+\\section{Methodology}
+\\subsection{Problem Formulation}
+Let $\\mathcal{X} = \\{x_1, x_2, \\ldots, x_n\\}$ be the input space.
+We define our objective function as:
+
+\\[
+  \\mathcal{L}(\\theta) = \\frac{1}{n} \\sum_{i=1}^{n} \\ell(f_\\theta(x_i), y_i) + \\lambda \\|\\theta\\|_2^2
+\\]
+
+where $\\lambda > 0$ is the regularization parameter and $f_\\theta$ denotes
+our model parameterized by $\\theta$.
+
+\\subsection{Algorithm}
+The update rule at step $t$ is given by:
+
+\\begin{equation}
+  \\theta^{(t+1)} = \\theta^{(t)} - \\eta_t \\nabla_\\theta \\mathcal{L}(\\theta^{(t)})
+  \\label{eq:update}
+\\end{equation}
+
+Equation \\ref{eq:update} shows the standard gradient descent update.
+
+\\section{Experiments}
+\\subsection{Datasets}
+We evaluate our method on three standard benchmarks:
+
+\\begin{table}[h]
+\\centering
+\\begin{tabular}{|l|c|c|c|}
+\\hline
+\\textbf{Dataset} & \\textbf{Train} & \\textbf{Test} & \\textbf{Classes} \\\\
+\\hline
+Dataset A & 50,000 & 10,000 & 10 \\\\
+Dataset B & 60,000 & 6,000 & 100 \\\\
+Dataset C & 73,257 & 26,032 & 10 \\\\
+\\hline
+\\end{tabular}
+\\caption{Summary of benchmark datasets used in our evaluation.}
+\\label{tab:datasets}
+\\end{table}
+
+\\subsection{Results}
+Our method achieves state-of-the-art performance with \\textbf{94.2\\%} accuracy
+on Dataset A, significantly outperforming existing approaches.
+
+The improvement is statistically significant with $p < 0.01$ under a
+two-tailed $t$-test.
+
+\\section{Conclusion}
+In this work, we presented a novel approach to the problem. Experimental
+results demonstrate the effectiveness of our method. Future work will
+explore extensions to larger-scale settings.
+
+\\begin{thebibliography}{9}
+\\bibitem{reference2024} J. Doe and A. Smith, ``A Method for Research,''
+  \\textit{Journal of Science}, vol. 42, pp. 1--15, 2024.
+\\bibitem{smith2023} A. Smith, ``Early Approaches,''
+  \\textit{Proc. Conf. on AI}, 2023.
+\\end{thebibliography}
+
+\\end{document}`;
+
+const TEMPLATES = {
+  ieee: `\\documentclass[conference]{IEEEtran}
+\\usepackage{amsmath,amssymb}
+\\title{IEEE Conference Paper Template}
+\\author{\\IEEEauthorblockN{Author Name}
+\\IEEEauthorblockA{Department\\\\University\\\\email@domain.com}}
+\\begin{document}
+\\maketitle
+\\begin{abstract}
+Abstract text here.
+\\end{abstract}
+\\section{Introduction}
+Introduction text.
+\\section{Conclusion}
+Conclusion.
+\\begin{thebibliography}{1}
+\\bibitem{ref1} Author, ``Title,'' \\textit{Journal}, 2024.
+\\end{thebibliography}
+\\end{document}`,
+
+  beamer: `\\documentclass{beamer}
+\\usetheme{Madrid}
+\\title{Presentation Title}
+\\author{Author Name}
+\\date{\\today}
+\\begin{document}
+\\begin{frame}
+\\titlepage
+\\end{frame}
+\\begin{frame}{Outline}
+\\tableofcontents
+\\end{frame}
+\\section{Introduction}
+\\begin{frame}{Introduction}
+\\begin{itemize}
+  \\item First point
+  \\item Second point
+  \\item Third point
+\\end{itemize}
+\\end{frame}
+\\section{Results}
+\\begin{frame}{Results}
+Our main result:
+\\[E = mc^2\\]
+\\end{frame}
+\\end{document}`,
+
+  report: `\\documentclass[12pt,a4paper]{report}
+\\usepackage[utf8]{inputenc}
+\\usepackage{amsmath}
+\\title{Research Report}
+\\author{Your Name}
+\\date{\\today}
+\\begin{document}
+\\maketitle
+\\tableofcontents
+\\chapter{Introduction}
+Introduction chapter.
+\\chapter{Literature Review}
+Literature review.
+\\chapter{Methodology}
+Methodology.
+\\chapter{Results}
+Results.
+\\chapter{Conclusion}
+Conclusion.
+\\end{document}`,
+};
+
+const SYMBOLS = [
+  ['\\alpha','α'],['\\beta','β'],['\\gamma','γ'],['\\delta','δ'],['\\epsilon','ε'],
+  ['\\zeta','ζ'],['\\eta','η'],['\\theta','θ'],['\\lambda','λ'],['\\mu','μ'],
+  ['\\nu','ν'],['\\xi','ξ'],['\\pi','π'],['\\rho','ρ'],['\\sigma','σ'],
+  ['\\tau','τ'],['\\phi','φ'],['\\chi','χ'],['\\psi','ψ'],['\\omega','ω'],
+  ['\\Gamma','Γ'],['\\Delta','Δ'],['\\Theta','Θ'],['\\Lambda','Λ'],['\\Xi','Ξ'],
+  ['\\Pi','Π'],['\\Sigma','Σ'],['\\Phi','Φ'],['\\Psi','Ψ'],['\\Omega','Ω'],
+  ['\\infty','∞'],['\\partial','∂'],['\\nabla','∇'],['\\forall','∀'],['\\exists','∃'],
+  ['\\in','∈'],['\\notin','∉'],['\\subset','⊂'],['\\supset','⊃'],['\\cup','∪'],
+  ['\\cap','∩'],['\\emptyset','∅'],['\\times','×'],['\\div','÷'],['\\pm','±'],
+  ['\\leq','≤'],['\\geq','≥'],['\\neq','≠'],['\\approx','≈'],['\\equiv','≡'],
+  ['\\rightarrow','→'],['\\leftarrow','←'],['\\Rightarrow','⇒'],['\\Leftarrow','⇐'],
+  ['\\leftrightarrow','↔'],['\\cdot','·'],['\\ldots','…'],['\\cdots','⋯'],
+  ['\\int','∫'],['\\sum','∑'],['\\prod','∏'],['\\sqrt{}','√'],['\\frac{}{}','f/g'],
+];
+
+// ══════════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════════
+function init() {
+  state.files['main.tex'] = { content: DEFAULT_TEX, name: 'main.tex' };
+  state.files['references.bib'] = { content: `@article{reference2024,
+  author    = {Doe, John and Smith, Anna},
+  title     = {A Method for Research},
+  journal   = {Journal of Science},
+  year      = {2024},
+  volume    = {42},
+  pages     = {1--15},
+}
+
+@inproceedings{smith2023,
+  author    = {Smith, Anna},
+  title     = {Early Approaches},
+  booktitle = {Proceedings of the Conference on AI},
+  year      = {2023},
+}`, name: 'references.bib' };
+
+  renderFileTree();
+  openFile('main.tex');
+  renderSymbols();
+  updateStats();
+
+  // auto-compile on change with debounce
+  const editor = document.getElementById('latex-editor');
+  editor.addEventListener('input', () => {
+    updateLineNumbers();
+    updateStats();
+    autoSave();
+    clearTimeout(state.autoCompileTimer);
+    state.autoCompileTimer = setTimeout(compileLatex, 2000);
+  });
+  editor.addEventListener('keydown', handleEditorKeydown);
+  editor.addEventListener('keyup', updateCursorPos);
+  editor.addEventListener('click', updateCursorPos);
+  editor.addEventListener('scroll', syncScroll);
+
+  setupResizer();
+  setLayout('split');
+  setTimeout(compileLatex, 500);
+}
+
+// ══════════════════════════════════════════════════════════
+//  FILE MANAGEMENT
+// ══════════════════════════════════════════════════════════
+function renderFileTree() {
+  const tree = document.getElementById('file-tree');
+  tree.innerHTML = '';
+  Object.keys(state.files).forEach(name => {
+    const el = document.createElement('div');
+    el.className = 'file-item' + (name === state.activeFile ? ' active' : '');
+    el.innerHTML = `${fileIcon(name)}<span>${name}</span>`;
+    el.onclick = () => openFile(name);
+    tree.appendChild(el);
+  });
+}
+
+function fileIcon(name) {
+  if (name.endsWith('.tex')) return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
+  if (name.endsWith('.bib')) return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>`;
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
+}
+
+function openFile(name) {
+  // save current
+  if (state.activeFile && state.files[state.activeFile]) {
+    state.files[state.activeFile].content = document.getElementById('latex-editor').value;
+  }
+  state.activeFile = name;
+  document.getElementById('latex-editor').value = state.files[name]?.content || '';
+  renderFileTree();
+  renderTabs();
+  updateLineNumbers();
+  updateStats();
+}
+
+function addFile() {
+  const name = prompt('New file name:', 'chapter2.tex');
+  if (!name) return;
+  state.files[name] = { content: `% ${name}\n`, name };
+  renderFileTree();
+  openFile(name);
+  toast(`Created ${name}`);
+}
+
+function renderTabs() {
+  const tabs = document.getElementById('editor-tabs');
+  tabs.innerHTML = '';
+  Object.keys(state.files).forEach(name => {
+    const tab = document.createElement('div');
+    tab.className = 'editor-tab' + (name === state.activeFile ? ' active' : '');
+    tab.textContent = name;
+    tab.onclick = () => openFile(name);
+    tabs.appendChild(tab);
+  });
+}
+
+// ══════════════════════════════════════════════════════════
+//  EDITOR HELPERS
+// ══════════════════════════════════════════════════════════
+function handleEditorKeydown(e) {
+  const ed = document.getElementById('latex-editor');
+
+  // Ctrl+Enter: compile
+  if (e.ctrlKey && e.key === 'Enter') { e.preventDefault(); compileLatex(); return; }
+  // Ctrl+S: save
+  if (e.ctrlKey && e.key === 's') { e.preventDefault(); autoSave(); toast('Saved ✓'); return; }
+  // Ctrl+B: bold
+  if (e.ctrlKey && e.key === 'b') { e.preventDefault(); insertSnippet('\\textbf{', '}'); return; }
+  // Ctrl+I: italic
+  if (e.ctrlKey && e.key === 'i') { e.preventDefault(); insertSnippet('\\textit{', '}'); return; }
+  // Ctrl+M: inline math
+  if (e.ctrlKey && e.key === 'm') { e.preventDefault(); insertSnippet('$', '$'); return; }
+  // Ctrl+Shift+D: download
+  if (e.ctrlKey && e.shiftKey && e.key === 'D') { e.preventDefault(); downloadPDF(); return; }
+  // Ctrl+Shift+S: symbols
+  if (e.ctrlKey && e.shiftKey && e.key === 'S') { e.preventDefault(); toggleSymbols(); return; }
+  // Ctrl+/: comment
+  if (e.ctrlKey && e.key === '/') {
+    e.preventDefault();
+    const s = ed.selectionStart; const e2 = ed.selectionEnd;
+    const val = ed.value;
+    const lineStart = val.lastIndexOf('\n', s-1) + 1;
+    if (val[lineStart] === '%') {
+      ed.value = val.slice(0, lineStart) + val.slice(lineStart+1);
+      ed.selectionStart = ed.selectionEnd = s - 1;
+    } else {
+      ed.value = val.slice(0, lineStart) + '%' + val.slice(lineStart);
+      ed.selectionStart = ed.selectionEnd = s + 1;
+    }
+    triggerInput(); return;
+  }
+  // Tab: indent
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const s = ed.selectionStart; const e2 = ed.selectionEnd;
+    ed.value = ed.value.slice(0,s) + '  ' + ed.value.slice(e2);
+    ed.selectionStart = ed.selectionEnd = s+2;
+    triggerInput(); return;
+  }
+  // Auto-close braces
+  const pairs = { '{':'}', '(':')', '[':']', '$':'$' };
+  if (pairs[e.key]) {
+    const s = ed.selectionStart; const e2 = ed.selectionEnd;
+    if (s !== e2) {
+      e.preventDefault();
+      const sel = ed.value.slice(s, e2);
+      ed.value = ed.value.slice(0,s) + e.key + sel + pairs[e.key] + ed.value.slice(e2);
+      ed.selectionStart = s+1; ed.selectionEnd = e2+1;
+      triggerInput();
+    }
+  }
+}
+
+function triggerInput() {
+  document.getElementById('latex-editor').dispatchEvent(new Event('input'));
+}
+
+function insertSnippet(before, after) {
+  const ed = document.getElementById('latex-editor');
+  const s = ed.selectionStart, e2 = ed.selectionEnd;
+  const sel = ed.value.slice(s, e2) || 'text';
+  ed.value = ed.value.slice(0,s) + before + sel + after + ed.value.slice(e2);
+  ed.selectionStart = s + before.length;
+  ed.selectionEnd = s + before.length + sel.length;
+  ed.focus(); triggerInput();
+}
+
+function insertBlock(before, after) {
+  const ed = document.getElementById('latex-editor');
+  const s = ed.selectionStart;
+  const sel = ed.value.slice(s, ed.selectionEnd) || '';
+  const insert = before + sel + after;
+  ed.value = ed.value.slice(0,s) + insert + ed.value.slice(ed.selectionEnd);
+  ed.selectionStart = ed.selectionEnd = s + before.length + sel.length;
+  ed.focus(); triggerInput();
+}
+
+function insertLine(text) {
+  const ed = document.getElementById('latex-editor');
+  const s = ed.selectionStart;
+  const lineEnd = ed.value.indexOf('\n', s);
+  const pos = lineEnd === -1 ? ed.value.length : lineEnd;
+  ed.value = ed.value.slice(0,pos) + '\n' + text + ed.value.slice(pos);
+  ed.selectionStart = ed.selectionEnd = pos + 1 + text.length;
+  ed.focus(); triggerInput();
+}
+
+function insertTemplate(name) {
+  const templates = {
+    ieee: TEMPLATES.ieee,
+    beamer: TEMPLATES.beamer,
+    report: TEMPLATES.report,
+  };
+  // show a small selection
+  const choice = prompt('Choose template: ieee, beamer, report', 'ieee');
+  if (!choice || !TEMPLATES[choice]) return;
+  document.getElementById('latex-editor').value = TEMPLATES[choice];
+  triggerInput();
+  toast(`Template "${choice}" loaded`);
+}
+
+function updateLineNumbers() {
+  const ed = document.getElementById('latex-editor');
+  const lines = ed.value.split('\n').length;
+  const ln = document.getElementById('line-numbers');
+  ln.textContent = Array.from({length: lines}, (_,i) => i+1).join('\n');
+  ln.scrollTop = ed.scrollTop;
+}
+
+function syncScroll() {
+  const ed = document.getElementById('latex-editor');
+  document.getElementById('line-numbers').scrollTop = ed.scrollTop;
+}
+
+function updateCursorPos() {
+  const ed = document.getElementById('latex-editor');
+  const s = ed.selectionStart;
+  const txt = ed.value.slice(0, s);
+  const lines = txt.split('\n');
+  document.getElementById('cursor-line').textContent = lines.length;
+  document.getElementById('cursor-col').textContent = lines[lines.length-1].length + 1;
+}
+
+function updateStats() {
+  const val = document.getElementById('latex-editor').value;
+  const words = val.trim() ? val.trim().split(/\s+/).length : 0;
+  document.getElementById('word-count').textContent = words;
+  document.getElementById('char-count').textContent = val.length;
+}
+
+function autoSave() {
+  if (state.activeFile) state.files[state.activeFile].content = document.getElementById('latex-editor').value;
+}
+
+// ══════════════════════════════════════════════════════════
+//  SYMBOLS
+// ══════════════════════════════════════════════════════════
+function renderSymbols() {
+  const panel = document.getElementById('symbol-panel');
+  SYMBOLS.forEach(([cmd, glyph]) => {
+    const btn = document.createElement('button');
+    btn.className = 'sym-btn';
+    btn.title = cmd;
+    btn.textContent = glyph;
+    btn.onclick = () => { insertSnippet(cmd, ''); toggleSymbols(false); };
+    panel.appendChild(btn);
+  });
+}
+
+function toggleSymbols(force) {
+  const panel = document.getElementById('symbol-panel');
+  const btn = document.getElementById('sym-toggle-btn');
+  const open = force !== undefined ? force : !panel.classList.contains('open');
+  panel.classList.toggle('open', open);
+  btn.classList.toggle('active', open);
+}
+
+// ══════════════════════════════════════════════════════════
+//  LAYOUT
+// ══════════════════════════════════════════════════════════
+function setLayout(mode) {
+  state.layout = mode;
+  const ed = document.getElementById('editor-pane');
+  const pv = document.getElementById('preview-pane');
+  const rs = document.getElementById('resizer');
+  ['btn-split','btn-editor','btn-preview'].forEach(id => document.getElementById(id).classList.remove('active'));
+  document.getElementById('btn-'+mode).classList.add('active');
+  if (mode === 'split') {
+    ed.style.display = ''; pv.style.display = ''; rs.style.display = '';
+    pv.style.width = '50%';
+  } else if (mode === 'editor') {
+    ed.style.display = ''; pv.style.display = 'none'; rs.style.display = 'none';
+  } else {
+    ed.style.display = 'none'; pv.style.display = ''; rs.style.display = 'none';
+    pv.style.width = '100%';
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+//  RESIZER
+// ══════════════════════════════════════════════════════════
+function setupResizer() {
+  const rs = document.getElementById('resizer');
+  const pv = document.getElementById('preview-pane');
+  const main = document.getElementById('main');
+  let dragging = false, startX = 0, startW = 0;
+
+  rs.addEventListener('mousedown', e => {
+    dragging = true; startX = e.clientX; startW = pv.offsetWidth;
+    rs.classList.add('dragging');
+    document.body.style.userSelect = 'none';
+    document.body.style.cursor = 'col-resize';
+  });
+  document.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    const dx = startX - e.clientX;
+    const newW = Math.max(200, Math.min(main.offsetWidth - 200, startW + dx));
+    pv.style.width = newW + 'px';
+  });
+  document.addEventListener('mouseup', () => {
+    if (!dragging) return;
+    dragging = false; rs.classList.remove('dragging');
+    document.body.style.userSelect = ''; document.body.style.cursor = '';
+  });
+}
+
+// ══════════════════════════════════════════════════════════
+//  LATEX COMPILER (RENDERER)
+// ══════════════════════════════════════════════════════════
+function setStatus(s, type='ok') {
+  const dot = document.getElementById('status-dot');
+  const text = document.getElementById('status-text');
+  const spinner = document.getElementById('compile-spinner');
+  dot.className = 'status-dot' + (type==='compiling' ? ' compiling' : type==='error' ? ' error' : '');
+  text.textContent = s;
+  spinner.classList.toggle('active', type==='compiling');
+}
+
+function compileLatex() {
+  autoSave();
+  setStatus('Compiling…', 'compiling');
+  setTimeout(() => {
+    try {
+      const src = state.files['main.tex']?.content || document.getElementById('latex-editor').value;
+      const html = latexToHtml(src);
+      document.getElementById('preview-page').innerHTML = html;
+      // re-render MathJax
+      if (window.MathJax) {
+        MathJax.typesetPromise([document.getElementById('preview-page')]).catch(e => console.warn(e));
+      }
+      setStatus('Compiled successfully ✓');
+      const now = new Date(); const t = now.toLocaleTimeString();
+      document.getElementById('last-compiled').textContent = `Last compiled: ${t}`;
+    } catch(err) {
+      setStatus('Compile error: ' + err.message, 'error');
+    }
+  }, 80);
+}
+
+// ══════════════════════════════════════════════════════════
+//  LATEX → HTML RENDERER
+// ══════════════════════════════════════════════════════════
+function latexToHtml(src) {
+  // strip comments
+  let s = src.replace(/(?<!\\)%[^\n]*/g, '');
+
+  // extract \begin{document}...\end{document}
+  const docMatch = s.match(/\\begin\{document\}([\s\S]*?)\\end\{document\}/);
+  const body = docMatch ? docMatch[1] : s;
+
+  // extract metadata
+  const titleMatch = s.match(/\\title\{([\s\S]*?)\}/);
+  const authorMatch = s.match(/\\author\{([\s\S]*?)\}/);
+  const dateMatch = s.match(/\\date\{([\s\S]*?)\}/);
+
+  let html = '';
+
+  // maketitle
+  if (s.includes('\\maketitle') && titleMatch) {
+    const titleRaw = titleMatch[1].replace(/\\\\/g,' ').replace(/\\large\s*/,'').trim();
+    html += `<div class="doc-title">${processInline(titleRaw)}</div>`;
+    if (authorMatch) {
+      const authorRaw = authorMatch[1].replace(/\\\\/g,' ').replace(/\\IEEEauthorblockN\{[^}]*\}/g,'').trim();
+      html += `<div class="doc-author">${processInline(authorRaw)}</div>`;
+    }
+    const dateText = dateMatch ? dateMatch[1].replace('\\today', new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})) : '';
+    html += `<div class="doc-date">${processInline(dateText)}</div>`;
+    html += `<hr class="hrule">`;
+  }
+
+  // process body
+  html += processBody(body);
+
+  return html;
+}
+
+function processBody(body) {
+  let html = '';
+  // abstract
+  body = body.replace(/\\begin\{abstract\}([\s\S]*?)\\end\{abstract\}/g, (_, content) => {
+    return `<div class="doc-abstract"><div class="doc-abstract-title">Abstract</div>${processInline(content.trim())}</div>`;
+  });
+
+  // verbatim (protect first)
+  const verbBlocks = [];
+  body = body.replace(/\\begin\{verbatim\}([\s\S]*?)\\end\{verbatim\}/g, (_, content) => {
+    const idx = verbBlocks.length;
+    verbBlocks.push(content);
+    return `%%VERB${idx}%%`;
+  });
+
+  // display math \[ ... \]
+  body = body.replace(/\\\[([\s\S]*?)\\\]/g, (_, math) => `<div class="math-block">\\[${math}\\]</div>`);
+
+  // equation/align/gather environments
+  body = body.replace(/\\begin\{(equation|align|gather|multline)\*?\}([\s\S]*?)\\end\{\1\*?\}/g, (_, env, content) => {
+    return `<div class="math-block">\\begin{${env}}${content}\\end{${env}}</div>`;
+  });
+
+  // table environment
+  body = body.replace(/\\begin\{table\}\[?\w*\]?([\s\S]*?)\\end\{table\}/g, (_, content) => {
+    let caption = '';
+    content = content.replace(/\\caption\{([\s\S]*?)\}/, (_, c) => { caption = c; return ''; });
+    content = content.replace(/\\label\{[^}]*\}/g,'');
+    const tabular = processTabular(content);
+    return `<div class="figure">${tabular}<div class="caption">${processInline(caption)}</div></div>`;
+  });
+
+  // figure environment
+  body = body.replace(/\\begin\{figure\}\[?\w*\]?([\s\S]*?)\\end\{figure\}/g, (_, content) => {
+    let caption = '';
+    content = content.replace(/\\caption\{([\s\S]*?)\}/, (_, c) => { caption = c; return ''; });
+    content = content.replace(/\\label\{[^}]*\}|\\centering/g,'');
+    content = content.replace(/\\includegraphics.*?\{[^}]*\}/g,'<div style="width:200px;height:120px;background:#f0f0f0;margin:auto;display:flex;align-items:center;justify-content:center;color:#999;font-size:10pt;border:1px solid #ccc">[Figure]</div>');
+    return `<div class="figure">${content}<div class="caption">${processInline(caption)}</div></div>`;
+  });
+
+  // sections
+  body = body.replace(/\\section\*?\{([^}]*)\}/g, (_, t) => `<h1>${processInline(t)}</h1>`);
+  body = body.replace(/\\subsection\*?\{([^}]*)\}/g, (_, t) => `<h2>${processInline(t)}</h2>`);
+  body = body.replace(/\\subsubsection\*?\{([^}]*)\}/g, (_, t) => `<h3>${processInline(t)}</h3>`);
+
+  // lists
+  body = body.replace(/\\begin\{itemize\}([\s\S]*?)\\end\{itemize\}/g, (_, content) => {
+    const items = content.split('\\item').filter(i => i.trim());
+    return '<ul>' + items.map(i => `<li>${processInline(i.trim())}</li>`).join('') + '</ul>';
+  });
+  body = body.replace(/\\begin\{enumerate\}([\s\S]*?)\\end\{enumerate\}/g, (_, content) => {
+    const items = content.split('\\item').filter(i => i.trim());
+    return '<ol>' + items.map(i => `<li>${processInline(i.trim())}</li>`).join('') + '</ol>';
+  });
+
+  // bibliography
+  body = body.replace(/\\begin\{thebibliography\}\{?\w*\}?([\s\S]*?)\\end\{thebibliography\}/g, (_, content) => {
+    const items = content.split('\\bibitem').filter(i => i.trim());
+    let out = '<h1>References</h1><div class="ref-list">';
+    items.forEach((item, i) => {
+      const label = item.match(/\{([^}]*)\}/);
+      const text = item.replace(/\{[^}]*\}/, '').trim();
+      out += `<div class="ref-item">[${i+1}] ${processInline(text)}</div>`;
+    });
+    return out + '</div>';
+  });
+
+  // tableofcontents / maketitle / other commands to strip
+  body = body.replace(/\\(maketitle|tableofcontents|newpage|clearpage|cleardoublepage|noindent|centering)/g, '');
+  body = body.replace(/\\(vspace|hspace|vskip|hskip)\*?\{[^}]*\}/g, '');
+
+  // horizontal rule
+  body = body.replace(/\\(hline|hrule|midrule|toprule|bottomrule)/g, '<hr class="hrule">');
+
+  // paragraph breaks
+  body = body.replace(/\n{2,}/g, '\n\n');
+
+  // restore verbatim
+  body = body.replace(/%%VERB(\d+)%%/g, (_, i) => `<div class="verbatim">${verbBlocks[i].replace(/</g,'&lt;')}</div>`);
+
+  // split into paragraphs
+  const paras = body.split('\n\n');
+  let result = '';
+  for (let p of paras) {
+    const trimmed = p.trim();
+    if (!trimmed) continue;
+    if (trimmed.startsWith('<h') || trimmed.startsWith('<ul') || trimmed.startsWith('<ol') ||
+        trimmed.startsWith('<div') || trimmed.startsWith('<hr') || trimmed.startsWith('<table')) {
+      result += trimmed;
+    } else {
+      result += `<p>${processInline(trimmed)}</p>`;
+    }
+  }
+
+  return html + result;
+}
+
+function processTabular(content) {
+  const tabMatch = content.match(/\\begin\{tabular\}\{([^}]*)\}([\s\S]*?)\\end\{tabular\}/);
+  if (!tabMatch) return content;
+  const rows = tabMatch[2].split('\\\\').map(r => r.trim()).filter(r => r && !r.match(/^\\hline$/));
+  let html = '<table>';
+  rows.forEach((row, i) => {
+    row = row.replace(/\\hline/g,'');
+    const cells = row.split('&').map(c => c.trim());
+    const tag = i === 0 ? 'th' : 'td';
+    html += '<tr>' + cells.map(c => `<${tag}>${processInline(c)}</${tag}>`).join('') + '</tr>';
+  });
+  return html + '</table>';
+}
+
+function processInline(s) {
+  if (!s) return '';
+  s = s
+    // textbf, textit, etc
+    .replace(/\\textbf\{([\s\S]*?)\}/g, '<strong>$1</strong>')
+    .replace(/\\textit\{([\s\S]*?)\}/g, '<em>$1</em>')
+    .replace(/\\emph\{([\s\S]*?)\}/g, '<em>$1</em>')
+    .replace(/\\underline\{([\s\S]*?)\}/g, '<u>$1</u>')
+    .replace(/\\texttt\{([\s\S]*?)\}/g, '<span class="code-inline">$1</span>')
+    .replace(/\\textsc\{([\s\S]*?)\}/g, '<span style="font-variant:small-caps">$1</span>')
+    .replace(/\\textrm\{([\s\S]*?)\}/g, '$1')
+    .replace(/\\textsf\{([\s\S]*?)\}/g, '$1')
+    // colors
+    .replace(/\\textcolor\{[^}]*\}\{([^}]*)\}/g, '$1')
+    // footnote
+    .replace(/\\footnote\{([\s\S]*?)\}/g, '<sup title="$1">†</sup>')
+    // href
+    .replace(/\\href\{([^}]*)\}\{([^}]*)\}/g, '<a href="$1" style="color:#1a5cb0">$2</a>')
+    .replace(/\\url\{([^}]*)\}/g, '<a href="$1" style="color:#1a5cb0">$1</a>')
+    // cite, ref
+    .replace(/\\cite\{([^}]*)\}/g, '[<em>$1</em>]')
+    .replace(/\\ref\{([^}]*)\}/g, '<em>ref:$1</em>')
+    .replace(/\\label\{[^}]*\}/g, '')
+    // special chars
+    .replace(/\\&/g, '&amp;')
+    .replace(/\\%/g, '%')
+    .replace(/\\#/g, '#')
+    .replace(/\\_/g, '_')
+    .replace(/\\\$/g, '$')
+    .replace(/\\textbackslash/g, '\\')
+    .replace(/``/g, '\u201C').replace(/''/g, '\u201D')
+    .replace(/`/g, '\u2018').replace(/'/g, '\u2019')
+    .replace(/---/g, '\u2014').replace(/--/g, '\u2013')
+    // strip remaining commands
+    .replace(/\\[a-zA-Z]+\*?\{([^}]*)\}/g, '$1')
+    .replace(/\\[a-zA-Z]+\*/g, '').replace(/\\[a-zA-Z]+/g, '')
+    .replace(/\{|\}/g, '')
+    // newlines inside paragraph
+    .replace(/\n/g, ' ')
+    .trim();
+  return s;
+}
+
+// ══════════════════════════════════════════════════════════
+//  PDF DOWNLOAD
+// ══════════════════════════════════════════════════════════
+function downloadPDF() {
+  toast('Preparing PDF for download…');
+  // Trigger browser print dialog which saves as PDF
+  const printWindow = window.open('', '_blank');
+  const title = document.getElementById('doc-title-input').value || 'document';
+  const previewHtml = document.getElementById('preview-page').innerHTML;
+
+  printWindow.document.write(`<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>${title}</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js"><\/script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 11pt;
+    line-height: 1.8;
+    color: #111;
+    padding: 60px 80px;
+    max-width: 720px;
+    margin: auto;
+  }
+  .doc-title { font-size:18pt;font-weight:bold;text-align:center;margin-bottom:6px;line-height:1.3; }
+  .doc-author { font-size:11pt;text-align:center;margin-bottom:4px; }
+  .doc-date { font-size:10pt;text-align:center;color:#555;margin-bottom:20px; }
+  .doc-abstract { margin:0 30px 20px;border:1px solid #ccc;padding:12px 16px;font-size:10pt; }
+  .doc-abstract-title { font-weight:bold;text-align:center;margin-bottom:6px; }
+  h1 { font-size:14pt;margin:20px 0 8px;font-weight:bold; }
+  h2 { font-size:12pt;margin:16px 0 6px;font-weight:bold; }
+  h3 { font-size:11pt;margin:12px 0 4px;font-weight:bold;font-style:italic; }
+  p { margin-bottom:10px;text-align:justify; }
+  .math-block { text-align:center;margin:14px 0;overflow-x:auto; }
+  ul,ol { margin:8px 0 8px 28px; }
+  li { margin-bottom:4px; }
+  table { border-collapse:collapse;margin:14px auto;font-size:10pt; }
+  td,th { border:1px solid #999;padding:5px 12px; }
+  th { font-weight:bold;background:#f5f5f5; }
+  .figure { text-align:center;margin:16px 0; }
+  .caption { font-size:9.5pt;color:#444;margin-top:4px; }
+  .hrule { border:none;border-top:1px solid #ccc;margin:16px 0; }
+  .verbatim { background:#f5f5f5;border:1px solid #ddd;padding:10px 14px;font-family:monospace;font-size:9.5pt;margin:10px 0;white-space:pre-wrap; }
+  .ref-item { font-size:9.5pt;margin-bottom:6px; }
+  .code-inline { font-family:monospace;background:#f0f0f0;padding:1px 5px;border-radius:3px;font-size:9.5pt; }
+  @media print { body { padding: 0; } }
+</style>
+</head>
+<body>${previewHtml}
+<script>
+window.MathJax = { startup: { ready() { MathJax.startup.defaultReady(); setTimeout(()=>window.print(), 1200); } } };
+<\/script>
+</body></html>`);
+  printWindow.document.close();
+  toast('Print dialog opened — save as PDF!');
+}
+
+// ══════════════════════════════════════════════════════════
+//  MODALS
+// ══════════════════════════════════════════════════════════
+function toggleShortcuts() {
+  const m = document.getElementById('shortcuts-modal');
+  m.classList.toggle('open');
+}
+
+// ══════════════════════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════════════════════
+function toast(msg, dur=2800) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), dur);
+}
+
+// ══════════════════════════════════════════════════════════
+//  GLOBAL KEYBOARD
+// ══════════════════════════════════════════════════════════
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey && e.shiftKey && e.key === 'D') { e.preventDefault(); downloadPDF(); }
+});
+
+// ══════════════════════════════════════════════════════════
+//  BOOT
+// ══════════════════════════════════════════════════════════
+init();
+</script>
+</body>
+</html>
